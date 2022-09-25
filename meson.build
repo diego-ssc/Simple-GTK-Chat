@@ -10,7 +10,8 @@ src = [
        'src/main/proyecto1/Proyecto1.cc',
        'src/main/proyecto1/vista/Vista.cc',
        'src/main/proyecto1/controlador/Chat.cc',
-       'src/main/proyecto1/controlador/Controlador.cc'
+       'src/main/proyecto1/modelo/Cliente.cc',
+       'src/main/proyecto1/modelo/Servidor.cc'
 ]
 
 exe = executable('proyecto1', src,

@@ -3,11 +3,13 @@
 
 int main(int argc, char **argv) {
     if(argc != 1) {
-        printf("%s takes no arguments.\n", argv[0]);
+        printf("%s no recibe argumentos.\n", argv[0]);
         return 1;
     }
 
-    int status = inicio(argc, argv);
+    Chat* chat = chat->get_instancia(argc, (const char **)argv);
+    chat->inicio();
+    
 
-    return status;
+    return 0;
 }
