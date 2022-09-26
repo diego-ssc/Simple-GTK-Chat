@@ -2,8 +2,17 @@
 #include "inc/Chat.h"
 #include "../vista/inc/Vista.h"
 #include <iostream>
+#include <thread>
+#include <future>
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 Chat* Chat::chat = nullptr;
+void catch_ctrl_c(int signal);
 
 void Chat::interfaz() {
   GtkApplication *app;
@@ -20,43 +29,63 @@ void Chat::interfaz() {
   }
 }
 
-Servidor* Chat::inicia_servidor(int puerto) {
+int Chat::inicia_servidor(int puerto) {
   int tamano_cola = 10;
-  Servidor* servidor = new Servidor(puerto);
+  std::unique_ptr<Servidor> servidor(new Servidor(puerto));
   servidor->servidor_socket();
   int file_descriptor = servidor->get_file_descriptor();
   servidor->servidor_bind(file_descriptor);
   servidor->servidor_listen(file_descriptor, tamano_cola);
-  return servidor;
+  //
+  int new_file_descriptor = servidor->servidor_accept(file_descriptor);
+  servidor->servidor_accept_message();
+  servidor->servidor_send(new_file_descriptor);
+  servidor->servidor_read(new_file_descriptor);
+  servidor->servidor_close(file_descriptor);
+  servidor->servidor_close(new_file_descriptor);
+  return 0;
 }
 
-Cliente* Chat::inicia_cliente(int puerto, void * buffer) {
-  Cliente* cliente = new Cliente(puerto, buffer);
+int Chat::inicia_cliente(int puerto) {
+  std::shared_ptr<Cliente> cliente(new Cliente(puerto));
   cliente->cliente_socket();
-  cliente->cliente_connect(cliente->get_file_descriptor());
-  return cliente;
+  cliente->cliente_connect();
+  
+    // SIGINT: interrupción externa
+  std::signal(SIGINT, catch_ctrl_c);
+  cliente->cliente_write();
+  cliente->cliente_read();
+  cliente->cliente_close();
+  return 0;
 }
 
-void Chat::inicio() {
-  //interfaz();
-  int puerto = 1234;
-    std::cout<<"Hello."<<std::endl;
-  Servidor* servidor = Chat::inicia_servidor(puerto);
-  Cliente* cliente = Chat::inicia_cliente(puerto, servidor->get_host_buffer());
-  int socket_cliente = cliente->get_file_descriptor();
-  int socket_servidor = servidor->get_file_descriptor();
+
+/**
+ * Define las acciones al capturar "Ctrl + C".
+ * @param signal Señal a la que responderá al detectarse
+ * la combinación de teclas.
+ * 
+ */
+void catch_ctrl_c(int signal) {
+  // char cadena[200] = "#exit";
+  // send(client_socket,str,sizeof(str),0);
+  // exit_flag=true;
+  // t_send.detach();
+  // t_recv.detach();
+  // close(client_socket);
+  exit(signal);
   
-  std::cout<<"Prev.write."<<std::endl;
-  cliente->cliente_write(socket_cliente);
-  std::cout<<"Prev.read"<<std::endl;
-  cliente->cliente_read(socket_cliente);
-  std::cout<<"Prev.Accept."<<std::endl;
-  int client_file_descriptor = servidor->servidor_accept(socket_servidor);
-  std::cout<<"Accept."<<std::endl;
-  servidor->servidor_send(client_file_descriptor);
-  servidor->servidor_read(client_file_descriptor);
-  cliente->cliente_close(socket_cliente);
-  servidor->servidor_close(socket_servidor);
-  servidor->servidor_close(client_file_descriptor);
+}
+
+
+int Chat::inicio(int ejecutable, int puerto) {
+  //interfaz();
+
+  if (ejecutable == 0)
+    return Chat::inicia_servidor(puerto);
+
+  return Chat::inicia_cliente(puerto);
+  
+
 }
 

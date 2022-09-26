@@ -41,6 +41,8 @@ public:
   */
   int servidor_accept(int descriptorArchivo);
 
+  void servidor_accept_message();
+  
   void servidor_send(int descriptor_archivo);
 
   void servidor_read(int descriptor_archivo);
@@ -50,15 +52,9 @@ public:
   */
   void servidor_close(int descriptor_archivo);
 
-  // /*
-  // * Destructor de la clase. // Mal comentario
-  // */
-  // ~Servidor();
-
-  // /*
-  // * Sobrecarga del operador indirección para las variables de clase.
-  // */
-  // int& operator*();
-  // struct sockaddr_int& operator*();
+  /*
+  * Destructor de la clase. // Mal comentario
+  */
+  ~Servidor();
 
 };
