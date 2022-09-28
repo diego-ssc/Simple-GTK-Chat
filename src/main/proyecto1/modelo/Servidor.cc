@@ -9,15 +9,11 @@
 #include "inc/Servidor.h"
 #include <iostream>
 
-Servidor::Servidor(int puerto) {
+Servidor::Servidor(int puerto, const char * ip) {
   bzero((char *) &this->direccion_servidor, sizeof(this->direccion_servidor));
   this->direccion_servidor.sin_family = AF_INET;
-  this->direccion_servidor.sin_addr.s_addr = INADDR_ANY;
+  this->direccion_servidor.sin_addr.s_addr = inet_addr(ip);
   this->direccion_servidor.sin_port = htons(puerto);
-  this->puerto = puerto;
-}
-
-void Servidor::set_puerto(int puerto) {
   this->puerto = puerto;
 }
 
@@ -87,7 +83,7 @@ void Servidor::servidor_send(int descriptor_archivo) {
 }
 
 void Servidor::servidor_read(int descriptor_archivo) {
-  const int tamano_buffer = 14;
+  const int tamano_buffer = 1024;
   bzero(this->host_buffer, tamano_buffer);
   int status = read(descriptor_archivo, this->host_buffer, tamano_buffer);
 

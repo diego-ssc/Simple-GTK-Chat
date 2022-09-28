@@ -4,7 +4,7 @@
 
 
 int main(int argc, char **argv) {
-    if(argc != 3) {
+    if(argc != 4) {
       printf("Uso:\n");
       printf("./proyecto1 Servidor Puerto\n");
       printf("./proyecto1 Cliente Puerto\n");
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     else
       ejecutable = 1;
       
-    int status = chat->inicio(ejecutable,  atoi(argv[2]));
+    int status = chat->inicio(ejecutable,  atoi(argv[2]), argv[3]);
     
 
     return status;

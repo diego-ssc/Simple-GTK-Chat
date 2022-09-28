@@ -46,9 +46,9 @@ protected:
   std::string parse_message_warning(std::string message);
   std::string parse_message_info(std::string message);
   
-  std::string write_message_error(std::string message);  
-  std::string write_message_warning(std::string message);
-  std::string write_message_info(std::string message);
+  void write_message_error(std::string message);  
+  void write_message_warning(std::string message);
+  void write_message_info(std::string message);
 
   
   virtual ~Procesador(); 

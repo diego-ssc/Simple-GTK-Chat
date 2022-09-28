@@ -21,8 +21,8 @@ protected:
     return chat;
   }
   void interfaz();
-  int inicio(int ejecutable, int puerto);
-  int inicia_servidor(int puerto);
-  int inicia_cliente(int puerto); 
+  int inicio(int ejecutable, int puerto, const char * ip);
+  int inicia_servidor(int puerto, const char * ip);
+  int inicia_cliente(int puerto, const char * ip); 
 };
 

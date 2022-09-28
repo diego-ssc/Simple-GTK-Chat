@@ -29,9 +29,10 @@ void Chat::interfaz() {
   }
 }
 
-int Chat::inicia_servidor(int puerto) {
+int Chat::inicia_servidor(int puerto, const char * ip) {
   int tamano_cola = 10;
-  std::unique_ptr<Servidor> servidor(new Servidor(puerto));
+  // std::unique_ptr<Servidor> servidor(new Servidor(puerto, ip));
+  Servidor* servidor = new Servidor(puerto, ip);
   servidor->servidor_socket();
   int file_descriptor = servidor->get_file_descriptor();
   servidor->servidor_bind(file_descriptor);
@@ -46,8 +47,9 @@ int Chat::inicia_servidor(int puerto) {
   return 0;
 }
 
-int Chat::inicia_cliente(int puerto) {
-  std::shared_ptr<Cliente> cliente(new Cliente(puerto));
+int Chat::inicia_cliente(int puerto, const char * ip) {
+  // std::shared_ptr<Cliente> cliente(new Cliente(puerto, ip));
+  Cliente *cliente = new Cliente(puerto, ip);
   cliente->cliente_socket();
   cliente->cliente_connect();
   
@@ -78,13 +80,13 @@ void catch_ctrl_c(int signal) {
 }
 
 
-int Chat::inicio(int ejecutable, int puerto) {
+int Chat::inicio(int ejecutable, int puerto, const char * ip) {
   //interfaz();
 
   if (ejecutable == 0)
-    return Chat::inicia_servidor(puerto);
+    return Chat::inicia_servidor(puerto, ip);
 
-  return Chat::inicia_cliente(puerto);
+  return Chat::inicia_cliente(puerto, ip);
   
 
 }

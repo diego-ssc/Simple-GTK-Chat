@@ -49,25 +49,22 @@ std::string Procesador::parse_message_info(std::string message) {
 }
 
 
-std::string Procesador::write_message_error(std::string message) {
+void Procesador::write_message_error(std::string message) {
   vacia_json();
   parsed_message["type"] = "ERROR";
   parsed_message["message"] = message;
-  return writer.write(parsed_message);
 }
 
-std::string Procesador::write_message_warning(std::string message) {
+void Procesador::write_message_warning(std::string message) {
   vacia_json();
   parsed_message["type"] = "WARNING";
   parsed_message["message"] = message;
-  return writer.write(parsed_message);
 }
 
-std::string Procesador::write_message_info(std::string message) {
+void Procesador::write_message_info(std::string message) {
   vacia_json();
   parsed_message["type"] = "INFO";
   parsed_message["message"] = message;
-  return writer.write(parsed_message);
 }
   
 

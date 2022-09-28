@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <bits/stdc++.h>
 #include <json/json.h>
+#include "Procesador_Cliente.h"
 
 class Cliente {
 
@@ -24,6 +25,7 @@ class Cliente {
   char buffer_recv[1024];
   char buffer_send[1024];
   char host_buffer[256];
+  Procesador_Cliente procesador;
 
   void error(const char *mensaje);
   struct hostent * get_server_hostname(void *host_buffer);
@@ -33,7 +35,7 @@ public:
   char nombre[256];
   static bool bandera_salida;
   std::thread hilo_envio, hilo_recepcion;
-  Cliente(int puerto);
+  Cliente(int puerto, const char * ip);
 
   void verifica_servidor();
   int get_file_descriptor();

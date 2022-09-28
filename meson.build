@@ -23,7 +23,8 @@ src = [
        'src/main/proyecto1/modelo/Cliente.cc',
        'src/main/proyecto1/modelo/Servidor.cc',
        'src/main/proyecto1/modelo/Procesador.cc',
-       'src/main/proyecto1/modelo/Procesador_Servidor.cc'
+       'src/main/proyecto1/modelo/Procesador_Servidor.cc',
+       'src/main/proyecto1/modelo/Procesador_Cliente.cc'
 ]					     
 
 tests_src = [

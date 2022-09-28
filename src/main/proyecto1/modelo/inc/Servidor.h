@@ -11,15 +11,13 @@ class Servidor {
   int file_descriptor;
   struct sockaddr_in direccion_servidor;
   struct sockaddr_in direccion_cliente;
-  char host_buffer[14];
+  char host_buffer[1024];
 
   void error(const char *mensaje);
   
 public:
 
-  Servidor(int puerto);
-
-  void set_puerto(int puerto);
+  Servidor(int puerto, const char * ip);
 
   int get_file_descriptor();
 

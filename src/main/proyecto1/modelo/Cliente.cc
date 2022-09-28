@@ -8,17 +8,24 @@ bool Cliente::bandera_salida = false;
  * cliente.
  * 
  */
-Cliente::Cliente(int puerto) {
+Cliente::Cliente(int puerto, const char * ip) {
   this->puerto = puerto;
-  this->servidor = Cliente::get_server_hostname(this->host_buffer);
-  Cliente::verifica_servidor();
   this->direccion_servidor.sin_family = AF_INET;
-  bcopy((char *)&this->servidor->h_addr,
-	(char *)&this->direccion_servidor.sin_addr.s_addr,
-	this->servidor->h_length);
   this->direccion_servidor.sin_port = htons(puerto);
-  this->direccion_servidor.sin_addr.s_addr=INADDR_ANY;
+  this->direccion_servidor.sin_addr.s_addr = inet_addr(ip);
   bzero(&this->direccion_servidor.sin_zero,0);//
+  getnameinfo((struct sockaddr *) &this->direccion_servidor,
+	      sizeof(direccion_servidor),
+	      host_buffer,
+	      sizeof(host_buffer),
+	      NULL, 0, 0);
+  this->servidor = gethostbyname((char *)host_buffer);
+  std::cout<<"[Cliente] Nombre host: "<<(char *)host_buffer<<std::endl;
+  Cliente::verifica_servidor();
+  
+  // bcopy((char *)&this->servidor->h_addr,
+  // 	(char *)&this->direccion_servidor.sin_addr.s_addr,
+  // 	this->servidor->h_length);
 }
 
 /**
@@ -106,8 +113,11 @@ void Cliente::cliente_write() {
   std::cout<<"[Cliente] Ingrese su mensaje:"<<std::endl;
   bzero(this->buffer_send, 1024);
   fgets(this->buffer_send, 1024, stdin);
-  int status = write(file_descriptor, this->buffer_send,
-		     strlen(this->buffer_send));
+  std::string message = procesador.write_message_new_user(buffer_send);
+  std::cout<< "message: "<< message<<std::endl;
+  std::cout<< "message:c_Str "<< message.c_str()<<std::endl;
+  int status = write(file_descriptor, message.c_str(),
+		     strlen(message.c_str()));
   if (status < 0)
     Cliente::error("[Cliente] Error al escribir al socket.");
   
