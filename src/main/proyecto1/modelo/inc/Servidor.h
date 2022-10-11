@@ -1,23 +1,60 @@
-#include <stdio.h>
+#ifndef SERVIDOR_H_
+#define SERVIDOR_H_
+
+#include <netinet/in.h>
+#include <map>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#include <stdio.h>
+#include <list>
+#include <thread>
+#include <mutex>
+#include "Cuarto.h"
+#include "Procesador_Servidor.h"
+#include "Fabrica_Procesadores.h"
 
+/**
+ * Clase que encapsula el comportamiento de un servidor
+ * que administrará el chat.
+ *
+ */
 class Servidor {
-  int puerto;
-  int file_descriptor;
-  struct sockaddr_in direccion_servidor;
-  struct sockaddr_in direccion_cliente;
-  char host_buffer[1024];
 
-  void error(const char *mensaje);
+  /** El puerto al que se enlazará el servidor. */
+  int puerto;
+  /** El entero que representa el socket del servidor. */
+  int file_descriptor;
+  /** Objeto que representa al servidor. */
+  struct sockaddr_in direccion_servidor;
+
+  /** Objeto que representa un cliente. */
+  struct sockaddr_in direccion_cliente;
+
+  /** Arreglo que almacenará los datos recibidos de los clientes. */
+  char host_buffer[1024];
+  /** Registra el número de clientes; además, funge como identificador
+      de los mismos. */
+  int seed;
+
+  Procesador_Servidor procesador;
+  
+  /**
+   * Diccionarios que almacenarán la información de los usuarios
+   * conectados y las salas creadas, a partir de un identificador
+   * entero.
+   *
+   */
+  std::map<int, Usuario> usuarios;
+  std::map<int, Cuarto> cuartos;
   
 public:
 
-  Servidor(int puerto, const char * ip);
+  Servidor(int puerto);
 
   int get_file_descriptor();
 
@@ -27,32 +64,49 @@ public:
   * Devuelve un descriptor de archivo de socket o -1,
   * en caso de error.
   */
-  void servidor_socket();
+  int servidor_socket();
 
-  void servidor_bind(int descriptor_archivo);
+  int servidor_bind();
 
-  void servidor_listen(int descriptorArchivo, int tamano_cola);
+  int servidor_listen(int tamano_cola);
 
   /*
   * Devuelve un nuevo descriptor de archivo de socket o -1,
   * en caso de error.
   */
-  int servidor_accept(int descriptorArchivo);
-
-  void servidor_accept_message();
+  int servidor_accept();
   
-  void servidor_send(int descriptor_archivo);
+  void servidor_send(int descriptor_archivo, char * message);
 
-  void servidor_read(int descriptor_archivo);
+  int servidor_read(int descriptor_archivo);
 
   /*
   * Cierra el descriptor de archivo de socket parámetro.
   */
   void servidor_close(int descriptor_archivo);
 
+  void global_message(std::string message);
+
+  void global_message_from(std::string message, int id);
+
+  void send_message_to(std::string message, int id);
+  
+  
+  void administra_cliente(int client_socket, int id, Usuario* usuario);
+  
+  /**
+   * Comienza la ejecución del servidor.
+   * @return 0, si la ejecución terminó correctamente;
+   * -1, en otro caso
+   *
+   */
+  int ejecuta();
+
   /*
-  * Destructor de la clase. // Mal comentario
+  * Destructor de la clase. 
   */
   ~Servidor();
 
 };
+
+#endif

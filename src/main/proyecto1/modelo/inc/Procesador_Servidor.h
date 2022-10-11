@@ -1,19 +1,16 @@
+#ifndef PROCESADOR_SERVIDOR_H_
+#define PROCESADOR_SERVIDOR_H_
+
 #include <json/json.h>
 #include <string>
 #include <unordered_map>
 #include <iostream>
 #include "EnumClassHash.h"
 #include "Procesador.h"
+#include "Protocolo.h"
 #include <list>
 
 class Procesador_Servidor : public Procesador {
-
-  enum Protocolo {
-    /** Mensajes que recibe el servidor */
-    IDENTIFY, STATUS, USERS, MESSAGE, PUBLIC_MESSAGE,
-    NEW_ROOM, INVITE, JOIN_ROOM, ROOM_USERS, ROOM_MESSAGE,
-    LEAVE_ROOM, DISCONNECT
-  };
 
   /** Diccionario que mapea cadenas equivalentes al enum
       Protocolo */
@@ -23,18 +20,115 @@ class Procesador_Servidor : public Procesador {
   void verifica_protocolo(Sintaxis miembro, Protocolo llave);
   
  public:
-  std::string parse_message_id(std::string message); 
-  std::string parse_message_status(std::string message);
-  void parse_message_users(std::string message);
+  
+  /**
+   * Recibe json de identificación del cliente y
+   * filtra el nombre del usuario registrado.
+   * @param message Json a leer
+   * @return El nombre del usuario registrado
+   *
+   */
+  std::list<std::string> parse_message_id(std::string message);
+
+  /**
+   * Recibe json de identificación del cliente y
+   * filtra el estado del usuario registrado.
+   * @param message Json a leer
+   * @return El estado del usuario registrado
+   *
+   */  
+  std::list<std::string> parse_message_status(std::string message);
+
+  /**
+   * Recibe json de petición que espera la lista
+   * de usuarios conectados al servidor y verifica
+   * su sintaxis.
+   * @param message Json a leer
+   * @return La señal para pedir la lista de usuarios
+   *
+   */
+  std::list<std::string> parse_message_users(std::string message);
+
+  /**
+   * Recibe json de envío de mensaje privado.
+   * @param message Json a leer
+   * @return Una lista que contiene el usuario origen
+   * y el mensaje
+   *
+   */  
   std::list<std::string> parse_message_private_message(std::string message);
+
+  /**
+   * Recibe json de envío de mensaje público.
+   * @param message Json a leer
+   * @return Una lista que contiene el usuario origen
+   * y el mensaje
+   *
+   */  
   std::list<std::string> parse_message_public_message(std::string message);
-  std::string parse_message_new_room(std::string message);
+  
+  /**
+   * Recibe json de creación de sala.
+   * @param message Json a leer
+   * @return El nombre de la nueva sala.
+   *
+   */  
+  std::list<std::string> parse_message_new_room(std::string message);
+
+  /**
+   * Recibe json de invitación de usuario.
+   * @param message Json a leer
+   * @return Una lista que contiene el nombre de la sala
+   * y el nombre de los integrantes que fueron invitados.
+   *
+   */ 
   std::list<std::string> parse_message_invite(std::string message);
-  std::string parse_message_join_room(std::string message);
-  std::string parse_message_room_users(std::string message);
+
+  /**
+   * Recibe json de petición de entrada a un cuarto.
+   * @param message Json a leer
+   * @return El nombre del cuarto al que se solicita entrar
+   *
+   */ 
+  std::list<std::string> parse_message_join_room(std::string message);
+
+  /**
+   * Recibe json de petición de que espera la lista
+   * de usuarios conectados al cuarto parámetro
+   * y verifica su sintaxis.
+   * @param message Json a leer
+   * @return El nombre del cuarto del que se solicita
+   * la lista de usuarios
+   *
+   */ 
+  std::list<std::string> parse_message_room_users(std::string message);
+
+  /**
+   * Recibe json de envío de mensaje a cuarto.
+   * @param message Json a leer
+   * @return Una lista que contiene el nombre del cuarto al
+   * que se enviará el mensage y el mensaje
+   *
+   */ 
   std::list<std::string> parse_message_room_message(std::string message);
-  std::string parse_message_leave_room(std::string message);
-  void parse_message_disconnect(std::string message);
+
+  /**
+   * Recibe json de desconexión de cuarto.
+   * @param message Json a leer
+   * @return El nombre del cuarto del que se desconectará
+   * el usuario
+   *
+   */ 
+  std::list<std::string> parse_message_leave_room(std::string message);
+
+    /**
+   * Recibe json de desconexión del chat, incluyendo todos
+   * los cuartos donde el usuario se haya unido.
+   * @param message Json a leer
+   * @return La señal para desconectar al usuario.
+   *
+   */ 
+  std::list<std::string> parse_message_disconnect(std::string message);
 
   std::string write_message_id_success(); 
   std::string write_message_id_new_user(std::string username);
@@ -94,3 +188,5 @@ class Procesador_Servidor : public Procesador {
 						 std::string roomname);
   
 };
+
+#endif

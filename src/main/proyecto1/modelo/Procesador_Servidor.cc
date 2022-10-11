@@ -2,7 +2,7 @@
 
 /** Diccionario que mapea cadenas equivalentes al enum
     Protocolo */
-std::unordered_map<Procesador_Servidor::Protocolo, std::string, EnumClassHash>
+std::unordered_map<Protocolo, std::string, EnumClassHash>
 const Procesador_Servidor::table_protocolo = { {Protocolo::IDENTIFY, "IDENTIFY"},
 					       {Protocolo::STATUS, "STATUS"},
 					       {Protocolo::USERS, "USERS"},
@@ -16,23 +16,45 @@ const Procesador_Servidor::table_protocolo = { {Protocolo::IDENTIFY, "IDENTIFY"}
 					       {Protocolo::LEAVE_ROOM, "LEAVE_ROOM"},
 					       {Protocolo::DISCONNECT, "DISCONNECT"}};
 
-std::string Procesador_Servidor::parse_message_id(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_id(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::IDENTIFY);
   verifica_miembro(Sintaxis::username);
-  return parsed_message[table_sintaxis.at(Sintaxis::username)].asString();
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());  
+  return lista;
 }
 
-std::string Procesador_Servidor::parse_message_status(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_status(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::STATUS);
   verifica_miembro(Sintaxis::status);
-  return parsed_message[table_sintaxis.at(Sintaxis::status)].asString();  
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::status)].asString());  
+  return lista;  
 }
 
-void Procesador_Servidor::parse_message_users(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_users(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::USERS);
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::type)].asString());
+  return lista;
 }
 
 std::list<std::string> Procesador_Servidor::parse_message_private_message(std::string message) {
@@ -57,11 +79,18 @@ std::list<std::string> Procesador_Servidor::parse_message_public_message(std::st
   return lista;  
 }
 
-std::string Procesador_Servidor::parse_message_new_room(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_new_room(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::NEW_ROOM);
   verifica_miembro(Sintaxis::roomname);
-  return parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString();
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());  
+  return lista;
 }
 
 std::list<std::string> Procesador_Servidor::parse_message_invite(std::string message) {
@@ -77,18 +106,32 @@ std::list<std::string> Procesador_Servidor::parse_message_invite(std::string mes
   return lista;
 }
 
-std::string Procesador_Servidor::parse_message_join_room(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_join_room(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::JOIN_ROOM);
   verifica_miembro(Sintaxis::roomname);
-  return parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString();
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
+  return lista;
 }
 
-std::string Procesador_Servidor::parse_message_room_users(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_room_users(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::ROOM_USERS);
   verifica_miembro(Sintaxis::roomname);
-  return parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString();  
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
+  return lista;  
 }
 
 std::list<std::string> Procesador_Servidor::parse_message_room_message(std::string message) {
@@ -102,16 +145,31 @@ std::list<std::string> Procesador_Servidor::parse_message_room_message(std::stri
   return lista;
 }
 
-std::string Procesador_Servidor::parse_message_leave_room(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_leave_room(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::LEAVE_ROOM);
   verifica_miembro(Sintaxis::roomname);
-  return parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString();  
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
+  return lista;  
 }
     
-void Procesador_Servidor::parse_message_disconnect(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Servidor::parse_message_disconnect(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::LEAVE_ROOM);
+  verifica_protocolo(Sintaxis::type, Protocolo::DISCONNECT);
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::type)].asString());
+  return lista;
 }
 
 

@@ -1,6 +1,6 @@
 #include "inc/Procesador_Cliente.h"
 
-  std::unordered_map<Procesador_Cliente::Protocolo, std::string, EnumClassHash>
+  std::unordered_map<Protocolo, std::string, EnumClassHash>
   const Procesador_Cliente::table_protocolo = { {Protocolo::NEW_USER, "IDENTIFY"},
 						{Protocolo::NEW_STATUS, "STATUS"},
 						{Protocolo::USER_LIST, "USERS"},
@@ -12,11 +12,18 @@
 						{Protocolo::LEFT_ROOM, "ROOM_USERS"},
 						{Protocolo::DISCONNECTED, "ROOM_MESSAGE"}};
 
-std::string Procesador_Cliente::parse_message_new_user(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Cliente::parse_message_new_user(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::NEW_USER);
   verifica_miembro(Sintaxis::username);
-  return parsed_message[table_sintaxis.at(Sintaxis::username)].asString();
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());
+  return lista;
 }
 
        
@@ -42,7 +49,7 @@ std::list<std::string> Procesador_Cliente::parse_message_user_list(std::string m
   return lista;
 }
 
-std::list<std::string> Procesador_Cliente::parse_message_message_from(std::string message) {
+std::list<std::string> Procesador_Cliente::parse_message_private_message_from(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::MESSAGE_FROM);
   verifica_miembro(Sintaxis::username);
@@ -113,11 +120,18 @@ std::list<std::string> Procesador_Cliente::parse_message_left_room(std::string m
   return lista;
 }
 
-std::string Procesador_Cliente::parse_message_disconnected(std::string message) {
+/**
+ * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos
+ * de lectura.
+ *
+ */
+std::list<std::string> Procesador_Cliente::parse_message_disconnected(std::string message) {
   parse_message(message);
   verifica_protocolo(Sintaxis::type, Protocolo::DISCONNECTED);
   verifica_miembro(Sintaxis::username);
-  return parsed_message[table_sintaxis.at(Sintaxis::username)].asString();
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());
+  return lista;
 }
 
 
@@ -125,7 +139,6 @@ std::string Procesador_Cliente::write_message_new_user(std::string username) {
   vacia_json();
   parsed_message["type"] = "IDENTIFY";
   parsed_message["username"] = username;
-  std::string mensaje = writer.write(parsed_message);
   return writer.write(parsed_message);
 }
 
@@ -142,7 +155,7 @@ std::string Procesador_Cliente::write_message_user_list() {
   return writer.write(parsed_message);
 }
 
-std::string Procesador_Cliente::write_message_message(std::string username,
+std::string Procesador_Cliente::write_message_private_message_to(std::string username,
 							   std::string message) {
   vacia_json();
   parsed_message["type"] = "MESSAGE";

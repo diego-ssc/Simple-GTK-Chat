@@ -1,28 +1,34 @@
-#include <stdio.h>
+#include <string.h>
+#include <iostream>
 #include "controlador/inc/Chat.h"
 #include <strings.h>
 
+void uso() {
+  std::cerr << "Uso" << std::endl;
+  std::cerr << "./proyecto1 Servidor Puerto" << std::endl;
+  std::cerr << "./proyecto1 Cliente Puerto Ip" << std::endl;
+  exit(1);
+}
 
 int main(int argc, char **argv) {
-    if(argc != 4) {
-      printf("Uso:\n");
-      printf("./proyecto1 Servidor Puerto\n");
-      printf("./proyecto1 Cliente Puerto\n");
-      return 1;
-    }
+  // if (argc < 2)
+  //   uso();
+  
+  // int ejecutable;
+  
+  // if (strcasecmp(argv[1], "Servidor") == 0)
+  //   ejecutable = 0;
+  // else
+  //   ejecutable = 1;
 
-    Chat* chat = chat->get_instancia(argc, (const char **)argv);
-    int ejecutable;
+  // if (ejecutable == 0 && argc != 3)
+  //   uso();
+  
+  // if (ejecutable == 1 && argc != 4)
+  //   uso();
+		   
+  Chat* chat = chat->get_instance(argc, (const char **)argv);
+  int status = chat->inicio();
 
-    
-    
-    if (strcasecmp(argv[1], "Servidor") == 0)
-      ejecutable = 0;
-    else
-      ejecutable = 1;
-      
-    int status = chat->inicio(ejecutable,  atoi(argv[2]), argv[3]);
-    
-
-    return status;
+  return status;
 }
