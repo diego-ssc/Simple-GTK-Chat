@@ -39,20 +39,56 @@ Vista_Cliente* Chat::get_vista_cliente() {
  int Chat::inicio() {
    set_vista(Vista::get_instance(get_argc(), get_argv()));
    set_vista_cliente(Vista_Cliente::get_instance(get_argc(), get_argv()));
+   set_vista_servidor(Vista_Servidor::get_instance(get_argc(), get_argv()));
    vista->main_window(); 
    return 0;
  }
 
-int Chat::inicia_servidor(int puerto) {
+int Chat::inicia_servidor(int puerto) {//ejecuta_servidor
   std::unique_ptr<Servidor> servidor(new Servidor(puerto));
-  return servidor->ejecuta();
+  int tamano_cola = 10;
+    
+  if (servidor->servidor_socket() < 0) {
+    vista_servidor->window_socket_error();
+    return -1;
+  }
+    
+  if (servidor->servidor_bind() < 0) {
+    vista_servidor->window_bind_error();
+    return -1;
+  }
+
+  if (servidor->servidor_listen(tamano_cola) < 0) {
+    vista_servidor->window_listen_error();
+    return -1;
+  }
+  
+  while(true) {
+    int client_socket = servidor->servidor_accept();
+    servidor->set_seed();
+    int seed = servidor->get_seed();
+    Usuario* usuario = new Usuario(seed, client_socket);
+    std::thread t = servidor->crea_hilo(client_socket, seed, usuario);
+    usuario->set_thread(move(t));
+    
+    // servidor_send(client_socket, );
+    servidor->servidor_read(client_socket);
+    servidor->servidor_close(servidor->get_file_descriptor());// loop before
+    servidor->servidor_close(client_socket);
+    
+    if (servidor->get_read_status() < 0)
+      vista_servidor->window_read_error();
+
+    if (servidor->get_write_status() < 0)
+      vista_servidor->window_send_error();
+  }
+  return 0;
 }
 
 int Chat::inicia_cliente(int puerto, const char * ip) {
-  printf("puerto: %d \n ip: %s \n", puerto, ip);
-  // std::shared_ptr<Cliente> cliente(new Cliente(puerto, ip));
-  Cliente *cliente = new Cliente(puerto, ip);
-  if (!valida_cliente(cliente)) 
+  // std::unique_ptr<Cliente> cliente(new Cliente(puerto, ip));
+  Cliente* cliente = new Cliente(puerto, ip);
+  if (!valida_cliente(cliente))//move(cliente) 
     return -1;
   
   if (cliente->cliente_connect() == -1) {

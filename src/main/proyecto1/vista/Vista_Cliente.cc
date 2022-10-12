@@ -7,7 +7,7 @@ extern "C" {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
     vista->set_ip_data(gtk_entry_get_text(GTK_ENTRY(vista->get_ip_entry())));
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_window_close(GTK_WINDOW(vista->get_welcome_widget()));
+    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_cliente(atoi(vista->get_port_data()), vista->get_ip_data());
   }
 
@@ -15,7 +15,7 @@ extern "C" {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
     vista->set_ip_data(gtk_entry_get_text(GTK_ENTRY(vista->get_ip_entry())));
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_window_close(GTK_WINDOW(vista->get_welcome_widget()));
+    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_cliente(atoi(vista->get_port_data()), vista->get_ip_data()); 
   }
 
@@ -23,11 +23,16 @@ extern "C" {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
     vista->set_ip_data(gtk_entry_get_text(GTK_ENTRY(vista->get_ip_entry())));
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_window_close(GTK_WINDOW(vista->get_welcome_widget()));
+    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_cliente(atoi(vista->get_port_data()), vista->get_ip_data()); 
   }
 
   G_MODULE_EXPORT void client_exit_app() {
+    gtk_main_quit();
+    exit(1);
+  }
+  
+  G_MODULE_EXPORT void exit_client_welcome_window() {
     gtk_main_quit();
     exit(1);
   }
@@ -100,6 +105,8 @@ Vista_Cliente::Vista_Cliente(int argc, char ** argv) {
   gtk_builder_add_callback_symbol(builder,"client_send_data",G_CALLBACK(client_send_data));
   gtk_builder_add_callback_symbol(builder,"ip_enter_signal",G_CALLBACK(ip_enter_signal));
   gtk_builder_add_callback_symbol(builder,"port_enter_signal",G_CALLBACK(port_enter_signal));
+  gtk_builder_add_callback_symbol(builder,"exit_client_welcome_window",
+				  G_CALLBACK(exit_client_welcome_window));
   gtk_builder_connect_signals(builder, NULL);
 }
 

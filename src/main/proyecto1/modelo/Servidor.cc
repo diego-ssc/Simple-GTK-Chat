@@ -19,6 +19,30 @@ int Servidor::get_file_descriptor() {
   return this->file_descriptor;
 }
 
+int Servidor::get_seed() {
+  return this->seed;
+}
+
+int Servidor::get_read_status() {
+  return this->read_status;
+}
+
+int Servidor::get_write_status() {
+  return this->write_status;
+}
+
+void Servidor::set_seed() {
+  this->seed++;
+}
+
+void Servidor::set_read_status(int status) {
+  this->read_status = status;
+}
+
+void Servidor::set_write_status(int status) {
+  this->write_status = status;
+}
+
 int Servidor::servidor_socket() {
   int socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
   this->file_descriptor = socket_file_descriptor;
@@ -91,38 +115,20 @@ void Servidor::send_message_to(std::string message, int id) {
 }
 
 void Servidor::administra_cliente(int client_socket, int id, Usuario* usuario) {
-  servidor_read(client_socket);
+  if (servidor_read(client_socket) < 0)
+    read_status = -1;
+  
   // std::string name = procesador.parse_message_id(std::string(get_host_buffer()));
   usuario->set_name(get_host_buffer());
   usuarios[id] = std::move(*usuario);// Revisar
   // std::string welcome_message = usuario->get_nombre() + " has joined.";
   procesador.write_message_id_new_user(usuario->get_nombre());
-  
 }
 
-
-int Servidor::ejecuta() {
-  int tamano_cola = 10;
-
-  servidor_socket();
-  servidor_bind();
-  servidor_listen(tamano_cola);
-  
-  while(true) {
-    int client_socket = servidor_accept();
-    seed++;
-    Usuario* usuario = new Usuario(seed, client_socket);
-    std::thread t(&Servidor::administra_cliente, this, client_socket, seed, usuario);
-    usuario->set_thread(move(t));
-    
-    // servidor_send(client_socket, );
-    servidor_read(client_socket);
-    servidor_close(get_file_descriptor());// loop before
-    servidor_close(client_socket);
-  }
-  
-
-  return 0;
+std::thread Servidor::crea_hilo(int client_socket, int seed, Usuario* usuario) {
+  std::thread t(&Servidor::administra_cliente, this,
+		client_socket, seed, usuario);
+  return t;
 }
 
 Servidor::~Servidor() {}

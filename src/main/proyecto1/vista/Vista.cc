@@ -9,11 +9,13 @@ printf("It works.\n");
 
 G_MODULE_EXPORT void button_clicked_cliente() {
   Vista_Cliente::get_instance()->welcome_window();
-  gtk_window_close(GTK_WINDOW(Vista::get_instance()->get_window()));
+  gtk_widget_hide(Vista::get_instance()->get_window());
 }
 
 G_MODULE_EXPORT void exit_app() {
-  gtk_window_close(GTK_WINDOW(Vista::get_instance()->get_window()));
+  // gtk_window_close(GTK_WINDOW(Vista::get_instance()->get_window()));
+  gtk_main_quit();
+  exit(1);
 }
 
 Vista::Vista(int argc, char ** argv) {

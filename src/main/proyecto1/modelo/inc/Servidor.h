@@ -14,6 +14,7 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <future>
 #include "Cuarto.h"
 #include "Procesador_Servidor.h"
 #include "Fabrica_Procesadores.h"
@@ -29,6 +30,12 @@ class Servidor {
   int puerto;
   /** El entero que representa el socket del servidor. */
   int file_descriptor;
+  /** El entero que representa el estado de la operación
+      de lectura del servidor. */
+  int read_status;
+  /** El entero que representa el estado de la operación
+      de escritura del servidor. */  
+  int write_status;
   /** Objeto que representa al servidor. */
   struct sockaddr_in direccion_servidor;
 
@@ -59,6 +66,58 @@ public:
   int get_file_descriptor();
 
   char* get_host_buffer();
+
+  /**
+   * Devuelve el número de clientes conectados
+   * al servidor.
+   * @return El número de clientes conectados
+   * al servidor.
+   *
+   */
+  int get_seed();
+
+  /**
+   * Devuelve el entero que representa el estado
+   * de la operación de lectura del servidor.
+   * @return 0, si no ocurrieron problemas durante
+   * la ejecución; -1, en otro caso.
+   *
+   */
+  int get_read_status();
+
+  /**
+   * Devuelve el entero que representa el estado
+   * de la operación de escritura del servidor.
+   * @return 0, si no ocurrieron problemas durante
+   * la ejecución; -1, en otro caso.
+   *
+   */
+  int get_write_status();
+
+  /**
+   * Actualiza en una unidad el número de clientes
+   * conectados al servidor.
+   *
+   */
+  void set_seed();
+
+  /**
+   * Define el estado de la operación de lectura
+   * del servidor.
+   * @param status 0, si no ocurrieron problemas durante
+   * la ejecución; -1, en otro caso.
+   *
+   */
+  void set_read_status(int status);
+
+  /**
+   * Define el estado de la operación de escritura
+   * del servidor.
+   * @param status 0, si no ocurrieron problemas durante
+   * la ejecución; -1, en otro caso.
+   *
+   */
+  void set_write_status(int status);
   
   /*
   * Devuelve un descriptor de archivo de socket o -1,
@@ -90,17 +149,31 @@ public:
   void global_message_from(std::string message, int id);
 
   void send_message_to(std::string message, int id);
-  
-  
-  void administra_cliente(int client_socket, int id, Usuario* usuario);
-  
+
   /**
-   * Comienza la ejecución del servidor.
-   * @return 0, si la ejecución terminó correctamente;
-   * -1, en otro caso
+   * Se ancargará de la administración del cliente
+   * aceptado; incorporándolo a la lista de usuarios
+   * registados y escuchando las peticiones que este
+   * envíe.
+   * @param client_socket El socket del cliente.
+   * @param id El identificador del cliente.
+   * @param usuario El usuario asociado al socket.
+   * @return 0, si su ejecución no tuvo ningún error;
+   * -1, en otro caso.
    *
    */
-  int ejecuta();
+  void administra_cliente(int client_socket, int id, Usuario* usuario);
+
+  /**
+   * Crea los hilos para la administración de los clientes.
+   * @param client_socket El socket del cliente.
+   * @param seed El identificador del cliente.
+   * @param usuario El usuario asociado al socket.
+   * @return El hilo que se encargará de administrar el
+   * cliente.
+   *
+   */
+  std::thread crea_hilo(int client_socket, int seed, Usuario* usuario);
 
   /*
   * Destructor de la clase. 
