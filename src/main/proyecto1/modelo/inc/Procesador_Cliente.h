@@ -23,6 +23,7 @@ class Procesador_Cliente : public Procesador {
   std::list<std::string> parse_message_user_list(std::string message);
   std::list<std::string> parse_message_private_message_from(std::string message);
   std::list<std::string> parse_message_public_message_from(std::string message);
+  std::list<std::string> parse_message_invitation(std::string message);
   std::list<std::string> parse_message_joined_room(std::string message);
   std::list<std::string> parse_message_room_user_list(std::string message);
   std::list<std::string> parse_message_room_message_from(std::string message);

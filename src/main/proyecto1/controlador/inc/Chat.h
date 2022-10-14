@@ -41,7 +41,16 @@ protected:
   Vista_Servidor *vista_servidor;
   /** La interfaz del cliente */
   Vista_Cliente *vista_cliente;
-
+  /** Hilos de ejecución para la vista del servidor
+   y la ejecución principal de este. */
+  std::thread h;
+  /** Hilos de ejecución para el envío
+   y la recpeción de mensajes del cliente. */
+  std::thread wrt, rcv;
+  /** Servidor de la aplicación */
+  Servidor* servidor;
+  /** Cliente de la aplicación */
+  Cliente* cliente;
   
  public:
   
@@ -98,6 +107,47 @@ protected:
   char** get_argv();
 
   /**
+   * Devuelve el hilo de ejecución de la ejecución principal
+   * del servidor.
+   * @return El hilo de ejecución de la ejecución principal
+   * del servidor.
+   *
+   */   
+  std::thread get_thread_h();
+
+  /**
+   * Devuelve el hilo de ejecución de envío de mensajes
+   * del cliente.
+   * @return El hilo de ejecución de envío de mensajes
+   * del cliente.
+   *
+   */   
+  std::thread get_thread_wrt();
+
+  /**
+   * Devuelve el hilo de ejecución de recepción de mensajes
+   * del cliente.
+   * @return El hilo de ejecución de recepción de mensajes
+   * del cliente.
+   *
+   */   
+  std::thread get_thread_rcv();
+
+  /**
+   * Devuelve el servidor de la aplicación.
+   * @return El servidor de la aplicación.
+   *
+   */
+  Servidor* get_servidor();
+
+  /**
+   * Devuelve el cliente de la aplicación.
+   * @return El cliente de la aplicación.
+   *
+   */
+  Cliente* get_cliente();
+  
+  /**
    * Define la interfaz general de la aplicación.
    * @param vista La interfaz general de la aplicación
    *
@@ -117,7 +167,7 @@ protected:
    *
    */
   void set_vista_cliente(Vista_Cliente* vista);
-
+  
   /**
    * Devuelve la interfaz general de la aplicación.
    * @return La interfaz general de la aplicación.
@@ -151,6 +201,19 @@ protected:
    */  
   int inicia_servidor(int puerto);
 
+  /**
+   * Hace que el servidor espere indefinidamente las
+   * solicitudes de conexión.
+   */  
+  void ejecuta_servidor(Servidor* servidor);
+
+  /**
+   * Cierra el socket del servidor y termina los hilos
+   * creados por el mismo.
+   *
+   */
+  void termina_servidor();
+  
   /**
    * Inicia el cliente.
    * @return 0, si la ejecución terminó correctamente

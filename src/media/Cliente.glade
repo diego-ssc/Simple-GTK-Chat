@@ -99,7 +99,7 @@
                     <property name="can-focus">True</property>
                     <property name="shadow-type">in</property>
                     <child>
-                      <object class="GtkTextView">
+                      <object class="GtkTextView" id="client_text_box">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-left">12</property>

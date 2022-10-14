@@ -135,7 +135,7 @@ class Procesador_Servidor : public Procesador {
   std::string write_message_id_failure(std::string username); 
 
   std::string write_message_status_success();
-  std::string write_message_status_new_status(std::string message,
+  std::string write_message_status_new_status(std::string username,
 					      std::string status);
   std::string write_message_status_failure(std::string status);
   

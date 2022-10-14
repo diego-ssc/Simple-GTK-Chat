@@ -21,6 +21,11 @@ protected:
     type, message, operation, username, status, usernames,
     roomname
   };
+
+/** Diccionario que mapea elementos del Protocolo
+    a cadenas */
+  static std::unordered_map<std::string, Protocolo>
+  const protocolo_str; 
   
   /** Diccionario que mapea cadenas equivalentes al enum
       Protocolo */
@@ -31,7 +36,7 @@ protected:
       Sintaxis */
   static std::unordered_map<Sintaxis, std::string, EnumClassHash>
   const table_sintaxis;
-    
+  
   void error(const char *message);
   void verifica_protocolo(Sintaxis miembro, Protocolo llave);
   void verifica_miembro(Sintaxis miembro);
@@ -39,6 +44,16 @@ protected:
   void vacia_json();
   
  public:
+  /**
+   * Devuelve el tipo del mensaje recibido.
+   * (Correspondiente a uno de los definidos
+   * en el protocolo).
+   * @param message El mensaje recibido.
+   * @return El tipo del mensaje recibido.
+   *
+   */
+  Protocolo get_type(std::string message);
+  
   Procesador();
 
   std::list<std::string> parse_message_response(std::string message);

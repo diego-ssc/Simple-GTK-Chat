@@ -8,18 +8,28 @@ extern "C" {
   G_MODULE_EXPORT void server_send_data() {
     Vista_Servidor* vista = Vista_Servidor::get_instance();
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_window_close(GTK_WINDOW(vista->get_welcome_widget()));
+    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_servidor(atoi(vista->get_port_data()));
   }
 
   G_MODULE_EXPORT void server_enter_signal_send_data() {
     Vista_Servidor* vista = Vista_Servidor::get_instance();
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_window_close(GTK_WINDOW(vista->get_welcome_widget()));
+    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_servidor(atoi(vista->get_port_data()));
   }
   
   G_MODULE_EXPORT void server_exit_app() {
+    gtk_main_quit();
+    Chat* chat = Chat::get_instance();
+    delete chat->get_servidor();
+    chat->get_thread_h().detach();
+    chat->termina_servidor();
+    delete chat;
+    exit(1);
+  }
+
+  G_MODULE_EXPORT void server_exit_welcome_window() {
     gtk_main_quit();
     exit(1);
   }
@@ -58,6 +68,8 @@ Vista_Servidor::Vista_Servidor(int argc, char** argv) {
   gtk_builder_add_callback_symbol(builder,
 				  "server_enter_signal_send_data",
 				  G_CALLBACK(server_enter_signal_send_data));
+    gtk_builder_add_callback_symbol(builder,"server_exit_welcome_window",
+				  G_CALLBACK(server_exit_welcome_window));  
   gtk_builder_connect_signals(builder, NULL);
 }
 
@@ -141,9 +153,14 @@ GtkWidget * Vista_Servidor::get_server_widget() {
   return this->window;
 }
 
+GtkWidget * Vista_Servidor::get_text_box() {
+  return this->text_box;
+}
+
 void Vista_Servidor::welcome_window() {
   port = GTK_ENTRY(gtk_builder_get_object(builder, "port_entry"));
   g_object_unref(builder);
+  gtk_window_set_position(GTK_WINDOW(welcome), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(welcome);
 }
 
@@ -160,6 +177,7 @@ void Vista_Servidor::server_window() {
   window = GTK_WIDGET(gtk_builder_get_object(builder, "server_window"));
   user_list = GTK_WIDGET(gtk_builder_get_object(builder, "user_list"));
   user_list_container = GTK_WIDGET(gtk_builder_get_object(builder, "user_list_container"));
+  text_box = GTK_WIDGET(gtk_builder_get_object(builder, "server_text_box"));
   
   if (window == NULL) {
     fprintf(stderr, "No ha sido posible extraer widget \"client_window\".\n");
@@ -176,15 +194,21 @@ void Vista_Servidor::server_window() {
     exit(1);
   }
 
+  if (text_box == NULL) {
+    fprintf(stderr, "No ha sido posible extraer widget \"text_box\".\n");
+    exit(1);
+  }
+
   gtk_builder_add_callback_symbol(builder,"server_exit_app",G_CALLBACK(server_exit_app));
   gtk_builder_add_callback_symbol(builder,
 				  "server_hide_show_user_list",
 				  G_CALLBACK(server_hide_show_user_list));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
+  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(window);
   gtk_widget_hide(user_list_container);
-  gtk_main();  
+  gtk_main();
 }
 
 void Vista_Servidor::window_bind_error() {

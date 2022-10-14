@@ -2,7 +2,7 @@ project('proyecto1', 'cpp',
   version : '0.1',
   default_options : ['warning_level=3'])
 
-add_global_arguments('-lpthread', '-rdynamic', language : 'cpp')
+add_global_arguments('-lpthread', '-rdynamic', '-g',language : 'cpp')
 
 shared_library('proyecto1')
 

@@ -15,6 +15,7 @@
 #include <thread>
 #include <mutex>
 #include <future>
+#include <gtk/gtk.h>
 #include "Cuarto.h"
 #include "Procesador_Servidor.h"
 #include "Fabrica_Procesadores.h"
@@ -25,7 +26,7 @@
  *
  */
 class Servidor {
-
+  
   /** El puerto al que se enlazará el servidor. */
   int puerto;
   /** El entero que representa el socket del servidor. */
@@ -36,28 +37,34 @@ class Servidor {
   /** El entero que representa el estado de la operación
       de escritura del servidor. */  
   int write_status;
+  /** El objeto que guarda los mensajes de aviso emitidos
+      por el servidor. */
+  GtkTextBuffer* text_buffer;
+  
   /** Objeto que representa al servidor. */
   struct sockaddr_in direccion_servidor;
 
   /** Objeto que representa un cliente. */
   struct sockaddr_in direccion_cliente;
+  /** Mutex para hilos de ejecución */
+  std::mutex client_mutex, send_mutex;
 
   /** Arreglo que almacenará los datos recibidos de los clientes. */
   char host_buffer[1024];
   /** Registra el número de clientes; además, funge como identificador
       de los mismos. */
   int seed;
-
+  
   Procesador_Servidor procesador;
   
   /**
    * Diccionarios que almacenarán la información de los usuarios
-   * conectados y las salas creadas, a partir de un identificador
-   * entero.
+   * conectados y las salas creadas, a partir de una cadema
+   * representante de su nombre.
    *
    */
-  std::map<int, Usuario> usuarios;
-  std::map<int, Cuarto> cuartos;
+  std::map<std::string, Usuario*> usuarios;
+  std::map<std::string, Cuarto> cuartos;
   
 public:
 
@@ -118,6 +125,15 @@ public:
    *
    */
   void set_write_status(int status);
+
+  /**
+   * Define el objeto que guarda los mensajes de aviso emitidos
+   * por el servidor.
+   * @param text_buffer El objeto que guarda los mensajes de aviso
+   * emitidos por el servidor.
+   *
+   */
+  void set_text_buffer(GtkTextBuffer* text_buffer);
   
   /*
   * Devuelve un descriptor de archivo de socket o -1,
@@ -135,7 +151,7 @@ public:
   */
   int servidor_accept();
   
-  void servidor_send(int descriptor_archivo, char * message);
+  int servidor_send(int descriptor_archivo, char * message);
 
   int servidor_read(int descriptor_archivo);
 
@@ -146,15 +162,15 @@ public:
 
   void global_message(std::string message);
 
-  void global_message_from(std::string message, int id);
+  void global_message_from(std::string message, int sender_id);
 
-  void send_message_to(std::string message, int id);
+  void send_message_to(std::string message, int socket);
 
   /**
    * Se ancargará de la administración del cliente
    * aceptado; incorporándolo a la lista de usuarios
-   * registados y escuchando las peticiones que este
-   * envíe.
+   * registados y escuchando las peticiones que
+   * este envíe.
    * @param client_socket El socket del cliente.
    * @param id El identificador del cliente.
    * @param usuario El usuario asociado al socket.
@@ -162,7 +178,7 @@ public:
    * -1, en otro caso.
    *
    */
-  void administra_cliente(int client_socket, int id, Usuario* usuario);
+  void administra_cliente(Usuario* usuario);
 
   /**
    * Crea los hilos para la administración de los clientes.
@@ -173,8 +189,16 @@ public:
    * cliente.
    *
    */
-  std::thread crea_hilo(int client_socket, int seed, Usuario* usuario);
+  std::thread crea_hilo(Usuario* usuario);
 
+  /**
+   * Termina los hilos de ejecución creados y cierra el socket
+   * del servidor.
+   *
+   */
+  void termina_ejecucion();
+  
+  
   /*
   * Destructor de la clase. 
   */

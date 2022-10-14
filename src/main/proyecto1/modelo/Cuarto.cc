@@ -1,12 +1,23 @@
 #include "inc/Cuarto.h"
 
-Cuarto::Cuarto(int id) {
-  this->id = id;
-  this->nombre = "Cuarto " + id;
+Cuarto::Cuarto() {}
+
+Cuarto::Cuarto(Cuarto && room) {
+  this->nombre = room.nombre;
 }
 
-int Cuarto::get_id() {
-  return this->id;
+Cuarto & Cuarto::operator=(Cuarto && room) {
+  nombre = room.nombre;
+  room.nombre = nullptr;   
+  return *this;
+}
+
+Cuarto::Cuarto(std::string nombre) {
+  this->nombre = nombre;
+}
+
+void Cuarto::set_nombre(std::string nombre) {
+  this->nombre = nombre;
 }
 
 std::string Cuarto::get_nombre() {
@@ -36,34 +47,33 @@ bool Cuarto::is_in(std::string nombre_usuario) {
 }
 
 bool Cuarto::is_invited(std::string nombre_usuario) {
-  std::unordered_map<std::string, Usuario>::iterator i;
+  std::map<std::string, Usuario>::iterator i;
   i = invited_users.find(nombre_usuario);
   
   return i != invited_users.end();
 }
 
-int Cuarto::add_member(std::string username, Usuario &&user) {
+int Cuarto::add_member(std::string username, Usuario* user) {
   if (is_in(username)) 
     return -1;
   if (!is_invited(username))
     return -2;
 
   // users.emplace(username, user);
-  users[username] = std::move(user);
-  std::unordered_map<std::string, Usuario>::iterator i = // eliminar de la lista de invitados,
+  users[username] = std::move(*user);
+  std::map<std::string, Usuario>::iterator i = // eliminar de la lista de invitados,
     invited_users.find(username);                        // una vez agregado
   invited_users.erase(i);
   return 0;
 }
 
-int Cuarto::invite_member(std::string username, Usuario &&user) {
+int Cuarto::invite_member(std::string username, Usuario* user) {
   if (is_in(username)) 
     return -1;
   if (is_invited(username)) 
     return -2;
 
-  invited_users[username] = std::move(user);
-  // invited_users.emplace(username, user);
+  invited_users[username] = std::move(*user);
   return 0;
 }
 

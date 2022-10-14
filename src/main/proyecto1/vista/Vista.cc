@@ -1,10 +1,11 @@
 #include "inc/Vista.h"
 #include "inc/Vista_Cliente.h"
-
+#include "inc/Vista_Servidor.h"
 Vista* Vista::vista = nullptr;
 
 G_MODULE_EXPORT void button_clicked_servidor() {
-printf("It works.\n");
+  Vista_Servidor::get_instance()->welcome_window();
+  gtk_widget_hide(Vista::get_instance()->get_window());
 }
 
 G_MODULE_EXPORT void button_clicked_cliente() {
@@ -13,7 +14,6 @@ G_MODULE_EXPORT void button_clicked_cliente() {
 }
 
 G_MODULE_EXPORT void exit_app() {
-  // gtk_window_close(GTK_WINDOW(Vista::get_instance()->get_window()));
   gtk_main_quit();
   exit(1);
 }
@@ -50,6 +50,7 @@ GtkWidget* Vista::get_window() {
 }
 
 void Vista::main_window() {
+  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(window);
   gtk_main();
 }

@@ -90,14 +90,14 @@ class Usuario {
    * @return El nombre del usuario
    *
    */  
-  std::string get_nombre();
+  std::string get_name();
 
   /**
    * Devuelve el estado del usuario.
    * @return El estado del usuario
    *
    */  
-  std::string get_estado();
+  std::string get_status();
   
   /**
    * Devuelve el socket del usuario.

@@ -1,3 +1,4 @@
+#pragma GCC diagnostic ignored "-Wswitch" // No se usarán todos miembros del enum Protocolo
 #include "inc/Cliente.h"
 
 bool Cliente::bandera_salida = false;
@@ -34,13 +35,25 @@ struct hostent * Cliente::get_servidor() {
   return this->servidor; 
 }
 
+void Cliente::set_text_buffer(GtkTextBuffer* text_buffer) {
+  this->text_buffer = text_buffer;
+}
+
 int Cliente::cliente_connect() {
   return connect(m_socket,
 		 (struct sockaddr *) &direccion_servidor,
 		 sizeof(direccion_servidor));
 }
 
-int Cliente::cliente_write(char * message) {
+int Cliente::cliente_write_message(std::string username,
+				   std::string message) {
+  std::string str_message = procesador.write_message_public_message(username,
+								    message);
+  return write(m_socket, str_message.c_str(),
+	       strlen(str_message.c_str()));
+}
+
+int Cliente::cliente_write_identify(std::string message) {
   std::string str_message = procesador.write_message_new_user(message);
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
@@ -55,39 +68,115 @@ void Cliente::cliente_close() {
   close(m_socket);
 }
 
-void Cliente::send_message() {
-
-  	while(1) {
-	  //cout<<"You : "<<def_col;
-	  // std::cin.getline(buffer_send, 1024);
-	  // send(file_descriptor, buffer_send, sizeof(buffer_send),0);
-	  // if(strcmp(str,"#exit")==0) {
-	  //   exit_flag=true;
-	  //   t_recv.detach();	
-	  // 		close(client_socket);
-	  // 		return;
-	  // }	
-	}
-	
+void Cliente::send_messages() {
 }
 
-void Cliente::recv_message() {
-  while(1) {
-    if(bandera_salida)
-      return;
-    int bytes_recibidos = recv(m_socket,nombre,sizeof(nombre),0);
-    if(bytes_recibidos <= 0)
-      continue;
-    recv(m_socket, buffer_recv, sizeof(buffer_recv), 0);
-    // if(strcmp(name,"#NULL")!=0)
-    //   cout<<color(color_code)<<name<<" : "<<def_col<<str<<endl;
-    // else
-    //   cout<<color(color_code)<<str<<endl;
-    // cout<<colors[1]<<"You : "<<def_col;
-    // fflush(stdout);
-  }
+void Cliente::recv_messages() {
+  // Variables para usarse dentro de while
+  std::string message;
+  std::string username;
+  std::string status;
+  std::string roomname;
   
+  std::list<std::string>::iterator i;
+  
+  GtkTextIter iter;
+  gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
+  gtk_text_buffer_create_tag(text_buffer, "lmarg", 
+			     "left_margin", 5, NULL);  
+  
+  while (true) {
+    if (cliente_read() <= 0)
+      continue;
+    
+    Protocolo protocolo = procesador.get_type(get_buffer_recv());
+    std::list<std::string>(Procesador::*parse)(std::string) =
+      Fabrica_Procesadores::recv_protocol(protocolo);
+    std::list<std::string> recvd_message = (procesador.*parse)
+      (std::string(get_buffer_recv()));
+
+    switch (protocolo) {
+    case NEW_USER:
+      username = recvd_message.front();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					       (username + " se ha conectado").c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case NEW_STATUS:
+      username = recvd_message.front();
+      status = recvd_message.back();
+      // cambiar status de lista mostrada
+      break;
+    case USER_LIST:
+      for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
+	std::cout<<*i<<std::endl;// Establecer como modelo de lista de usuarios
+      }
+      break;
+    case MESSAGE_FROM:
+      username = recvd_message.front();
+      message = recvd_message.back();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					       ("[Private]" + username + ": " + message).c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case PUBLIC_MESSAGE_FROM:
+      username = recvd_message.front();
+      message = recvd_message.back();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					       (username + ": " + message).c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case INVITATION:
+      message = recvd_message.front();
+      // como dialog
+      break;
+    case JOINED_ROOM:
+      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      username = recvd_message.back();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+					       (username + " se ha unido").c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case ROOM_USER_LIST:
+      for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
+	std::cout<<*i<<std::endl;// Establecer como modelo de lista de usuarios del cuarto
+      }
+      break;
+    case ROOM_MESSAGE_FROM:
+      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      i = recvd_message.begin();
+      username = *++i;
+      message = recvd_message.back();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+					       (username + ": " + message).c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case LEFT_ROOM:
+      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      username = recvd_message.back();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+					       (username + "se ha desconectado").c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case DISCONNECTED:
+      username = recvd_message.front();
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					       (username + "se ha desconectado").c_str(),
+					       -1, NULL, "lmarg",  NULL);
+      break;
+    case INFO:// dialog con operación relacionada
+      return;
+    case WARNING:
+      return;
+    case ERROR:
+      return;
+    }
+     
+    
+  }
 }
+
+
 
 Cliente::~Cliente() {
   delete(servidor);

@@ -203,7 +203,7 @@ std::string Procesador_Servidor::write_message_status_success() {
 }
 
 std::string Procesador_Servidor::write_message_status_new_status(std::string username,
-					    std::string status) {
+								 std::string status) {
   vacia_json();
   parsed_message["type"] = "NEW_STATUS";
   parsed_message["username"] = username;
@@ -371,8 +371,8 @@ std::string Procesador_Servidor::write_message_room_users_failure_invite(std::st
 
 
 std::string Procesador_Servidor::write_message_room_message_new(std::string roomname,
-					   std::string username,
-					   std::string message) {
+								std::string username,
+								std::string message) {
   vacia_json();	    
   parsed_message["type"] = "ROOM_MESSAGE_FROM";
   parsed_message["roomname"] = roomname;

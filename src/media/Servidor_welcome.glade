@@ -6,6 +6,7 @@
     <property name="can-focus">False</property>
     <property name="default-width">440</property>
     <property name="default-height">250</property>
+    <signal name="destroy" handler="server_exit_welcome_window" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>

@@ -10,6 +10,8 @@ class Vista_Servidor {
   GtkWidget *welcome;
   /** La ventana principal del servidor */
   GtkWidget *window;
+  /** El widget de registro de eventos */
+  GtkWidget *text_box;
   /** Administador de xml generado para la interfaz */
   GtkBuilder *builder;
   /** Variable para errores ocurridos al inicializar la interfaz */
@@ -165,6 +167,13 @@ public:
    *
    */
   GtkWidget * get_server_widget();
+
+  /**
+   * Devuelve el widget de registro de eventos.
+   * @return El widget de registro de eventos.
+   *
+   */
+  GtkWidget * get_text_box();
   
   /**
    * Muestra la ventana de bienvenida del servidor.

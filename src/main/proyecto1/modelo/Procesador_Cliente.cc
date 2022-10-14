@@ -6,6 +6,7 @@
 						{Protocolo::USER_LIST, "USERS"},
 						{Protocolo::MESSAGE_FROM, "MESSAGE"},
 						{Protocolo::PUBLIC_MESSAGE_FROM, "PUBLIC_MESSAGE"},
+						{Protocolo::INVITATION, "INVITATION"},
 						{Protocolo::JOINED_ROOM, "NEW_ROOM"},
 						{Protocolo::ROOM_USER_LIST, "INVITE"},
 						{Protocolo::ROOM_MESSAGE_FROM, "JOIN_ROOM"},
@@ -69,6 +70,19 @@ std::list<std::string> Procesador_Cliente::parse_message_public_message_from(std
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());  
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::message)].asString());
+  return lista;
+}
+
+std::list<std::string> Procesador_Cliente::parse_message_invitation(std::string message) {
+  parse_message(message);
+  verifica_protocolo(Sintaxis::type, Protocolo::INVITATION);
+  verifica_miembro(Sintaxis::message);
+  verifica_miembro(Sintaxis::username);
+  verifica_miembro(Sintaxis::roomname);
+  std::list<std::string> lista;
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::message)].asString());  
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());
+  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
   return lista;
 }
 
@@ -165,7 +179,7 @@ std::string Procesador_Cliente::write_message_private_message_to(std::string use
 }
 
 std::string Procesador_Cliente::write_message_public_message(std::string username,
-								  std::string message) {
+							     std::string message) {
   vacia_json();
   parsed_message["type"] = "PUBLIC_MESSAGE";
   parsed_message["username"] = username;

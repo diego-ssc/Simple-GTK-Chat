@@ -2,6 +2,35 @@
 
 Procesador::Procesador() {}
 
+/** Diccionario que mapea elementos del Protocolo
+    a cadenas */
+std::unordered_map<std::string, Protocolo>
+const Procesador::protocolo_str = { {"ERROR", Protocolo::ERROR},
+				    {"WARNING", Protocolo::WARNING},
+				    {"INFO", Protocolo::INFO},  
+				    {"NEW_USER", Protocolo::NEW_USER},
+				    {"NEW_STATUS", Protocolo::NEW_STATUS},
+				    {"USER_LIST", Protocolo::USER_LIST},
+				    {"MESSAGE_FROM", Protocolo::MESSAGE_FROM},
+				    {"PUBLIC_MESSAGE_FROM", Protocolo::PUBLIC_MESSAGE_FROM},
+				    {"JOINED_ROOM", Protocolo::JOINED_ROOM},
+				    {"ROOM_USER_LIST", Protocolo::ROOM_USER_LIST},
+				    {"ROOM_MESSAGE_FROM", Protocolo::ROOM_MESSAGE_FROM},
+				    {"LEFT_ROOM", Protocolo::LEFT_ROOM},
+				    {"DISCONNECTED", Protocolo::DISCONNECTED},
+				    {"IDENTIFY", Protocolo::IDENTIFY},
+				    {"STATUS", Protocolo::STATUS},
+				    {"USERS", Protocolo::USERS},
+				    {"MESSAGE", Protocolo::MESSAGE},
+				    {"PUBLIC_MESSAGE", Protocolo::PUBLIC_MESSAGE},
+				    {"NEW_ROOM", Protocolo::NEW_ROOM},
+				    {"INVITE", Protocolo::INVITE},
+				    {"JOIN_ROOM", Protocolo::JOIN_ROOM},
+				    {"ROOM_USERS", Protocolo::ROOM_USERS},
+				    {"ROOM_MESSAGE", Protocolo::ROOM_MESSAGE},
+				    {"LEAVE_ROOM", Protocolo::LEAVE_ROOM},
+				    {"DISCONNECT", Protocolo::DISCONNECT}};
+
 /** Diccionario que mapea cadenas equivalentes al enum
     Protocolo */
 std::unordered_map<Protocolo, std::string, EnumClassHash>
@@ -19,6 +48,13 @@ const Procesador::table_sintaxis = { {Sintaxis::type, "type"},
 				     {Sintaxis::status, "status"},
 				     {Sintaxis::usernames, "usernames"},
 				     {Sintaxis::roomname, "roomname"}};
+
+
+Protocolo Procesador::get_type(std::string message) {
+  parse_message(message);
+  std::string type = parsed_message[table_sintaxis.at(Sintaxis::type)].asString();
+  return protocolo_str.at(type);
+}
 
 void Procesador::parse_message(std::string message) {
   vacia_json();

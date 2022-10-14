@@ -57,11 +57,11 @@ int Usuario::get_id() {
   return this->id;
 }
 
-std::string Usuario::get_nombre() {
+std::string Usuario::get_name() {
   return this->nombre;
 }
 
-std::string Usuario::get_estado() {
+std::string Usuario::get_status() {
   return this->estado;
 }
 

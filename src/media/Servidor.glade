@@ -78,7 +78,7 @@
                     <property name="margin-right">4</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
-                    <signal name="clicked" handler="hide_show_user_list" swapped="no"/>
+                    <signal name="clicked" handler="server_hide_show_user_list" swapped="no"/>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">True</property>
@@ -98,7 +98,7 @@
                     <property name="can-focus">True</property>
                     <property name="shadow-type">in</property>
                     <child>
-                      <object class="GtkTextView">
+                      <object class="GtkTextView" id="server_text_box">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-left">12</property>
@@ -124,6 +124,9 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="tooltip-column">2</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
                         <child>
                           <object class="GtkTreeViewColumn" id="column1">
                             <property name="title" translatable="yes">Usuario</property>

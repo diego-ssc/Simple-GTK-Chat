@@ -1,7 +1,6 @@
 #ifndef CUARTO_H_
 #define CUARTO_H_
 
-#include <unordered_map>
 #include <map>
 #include <list>
 #include <iostream>
@@ -19,51 +18,34 @@ class Cuarto {
    * Diccionario que registra los usuarios que han sido
    * invitados al cuarto.
    */
-  std::unordered_map<std::string, Usuario> invited_users;
+  std::map<std::string, Usuario> invited_users;
 
-  /** El identificador del cuarto */
-  int id;
   /** El nombre del cuarto */
   std::string nombre;
-
-  /**
-   * Verifica que el usuario parámetro esté en el
-   * cuarto.
-   * @param nombre_usuario El nombre del usuario que
-   * se buscará en el cuarto
-   * @return true, si el usuario es integrante del cuarto;
-   * false, en otro caso
-   *
-   */
-  bool is_in(std::string nombre_usuario);
-
-  /**
-   * Verifica que el usuario parámetro esté en el
-   * diccionario de invitados.
-   * @param nombre_usuario El nombre del usuario que
-   * se buscará en el diccionario
-   * @return true, si el usuario es integrante del diccionario;
-   * false, en otro caso
-   *
-   */
-  bool is_invited(std::string nombre_usuario);
   
  public:
 
-  /**
-   * Método constructor de la clase
-   * @param id El identificador del cuarto
-   *
-   */
-  Cuarto(int id);
+  /** Constructor por omisión */
+  Cuarto();
 
-  /**
-   * Devuelve el identidicador del cuarto.
-   * @return El identificador del cuarto
-   *
-   */
-  int get_id();
+  /** Eliminar el constructor copia */
+  Cuarto(const Cuarto&) = delete;
+  
+  /** Eliminar el operador de asignación */
+  Cuarto& operator=(const Cuarto&) = delete;
 
+  Cuarto(Cuarto && room);
+
+  Cuarto & operator=(Cuarto && room);
+
+  Cuarto(std::string name);
+  
+  /**
+   * Define el nombre del cuarto.
+   * @param nombre El nombre del cuarto.
+   */
+  void set_nombre(std::string nombre);  
+  
   /**
    * Devuelve el nombre del cuarto.
    * @return El nombre del cuarto
@@ -86,7 +68,7 @@ class Cuarto {
    * o -2 si este no fue invitado
    *
    */
-  int add_member(std::string username, Usuario &&user);
+  int add_member(std::string username, Usuario* user);
 
   /**
    * Agrega a un usuario al diccionario de invitados
@@ -96,7 +78,7 @@ class Cuarto {
    * o -2 si este ya fue invitado
    *
    */
-  int invite_member(std::string username, Usuario &&user);
+  int invite_member(std::string username, Usuario* user);
 
   /**
    * Elimina a un usuario del cuarto
@@ -106,6 +88,28 @@ class Cuarto {
    *
    */  
   int eliminate_member(std::string username);
+
+  /**
+   * Verifica que el usuario parámetro esté en el
+   * cuarto.
+   * @param nombre_usuario El nombre del usuario que
+   * se buscará en el cuarto
+   * @return true, si el usuario es integrante del cuarto;
+   * false, en otro caso
+   *
+   */
+  bool is_in(std::string nombre_usuario);
+  
+  /**
+   * Verifica que el usuario parámetro esté en el
+   * diccionario de invitados.
+   * @param nombre_usuario El nombre del usuario que
+   * se buscará en el diccionario
+   * @return true, si el usuario es integrante del diccionario;
+   * false, en otro caso
+   *
+   */
+  bool is_invited(std::string nombre_usuario);
 
   /**
    * Destructor de la clase

@@ -22,6 +22,8 @@ class Vista_Cliente {
   GtkEntry *message_box;
   /** Objeto de registro de nombre de sala */
   GtkEntry *room_creation_entry;
+  /** Objeto de registro de nombre de usuario */
+  GtkEntry *name_entry;
   /** Botón de envío de información para la ventana de bienvenida */
   GtkButton *welcome_button;
   /** La lista de usuarios mostrada en cada sala */
@@ -30,16 +32,22 @@ class Vista_Cliente {
   GtkWidget *user_list_container;
   /** Ventana de creación de sala */
   GtkWidget *room_dialog;
+  /** Ventana de creación de sala */
+  GtkWidget *name_dialog;
   /** IP registrada por el usuario */
-  const char *ip_data;
+  const char* ip_data;
   /** Puerto registrada por el usuario */
-  const char *port_data;
+  const char* port_data;
   /** Mensaje registrdo por el usuario */
-  const char *message_data;
+  std::string message_data;
   /** Nombre de la sala a crear */
-  const char *room_name;
+  std::string room_name;
+  /** Nombre del usuario */
+  std::string username;
   /** Única instancia de la interfaz del cliente*/
   static Vista_Cliente* vista_cliente;
+  /** El widget de registro de mensajes */
+  GtkWidget *text_box;
   
   /**
    * Constructor de la clase Vista_Cliente.
@@ -133,14 +141,21 @@ public:
    * @param message_data El mensaje que mandará el cliente
    *
    */
-  void set_message_data(const char* message_data);
+  void set_message_data(std::string message_data);
 
   /**
    * Define el nombre de sala registrado del cliente.
    * @param room_name El nombre de sala 
    *
    */  
-  void set_room_name(const char* room_name);
+  void set_room_name(std::string room_name);
+
+  /**
+   * Define el nombre del usuario conectado.
+   * @param username El nombre del usuario 
+   *
+   */  
+  void set_username(std::string username);
   
   /**
    * Define la lista de usuarios del cliente.
@@ -168,14 +183,21 @@ public:
    * @return El mensaje del cliente
    *
    */ 
-  const char* get_message_data();
+  std::string get_message_data();
 
   /**
    * Devuelve el nombre de sala registrado del cliente.
    * @return El nombre de sala
    *
    */ 
-  const char* get_room_name();
+  std::string get_room_name();
+
+  /**
+   * Devuelve el nombre del usuario registrado.
+   * @return El nombre de usuario registrado
+   *
+   */ 
+  std::string get_username();
   
   /**
    * Devuelve el objeto que registró el IP del cliente.
@@ -199,12 +221,19 @@ public:
   GtkEntry* get_message_entry();
 
   /**
-   * Devuelve el objeto que el nombre de la sala a crear.
+   * Devuelve el objeto que guarda el nombre de la sala a crear.
    * @return El objeto que registró el nombre de la sala
    * a crear
    *
    */
   GtkEntry* get_room_creation_entry();
+
+  /**
+   * Devuelve el objeto que guarda el nombre usuario.
+   * @return El objeto que registró el nombre de usuario.
+   *
+   */
+  GtkEntry* get_name_entry();
 
   /**
    * Devuelve el objeto que registró la lista de usuarios.
@@ -242,6 +271,22 @@ public:
    *
    */
   GtkWidget * get_room_dialog();
+
+  /**
+   * Devuelve el widget de la ventana de registro
+   * de nombre de usuario.
+   * @return El widget de la ventana de registro
+   * de nombre de usuario
+   *
+   */
+  GtkWidget * get_name_dialog();
+
+  /**
+   * Devuelve el widget de registro de mensajes.
+   * @return El widget de registro de mensajes
+   *
+   */
+  GtkWidget* get_text_box();
   
   /**
    * Muestra la ventana de bienvenida del cliente.
@@ -249,6 +294,13 @@ public:
    */
   void welcome_window();
 
+  /**
+   * Muestra la ventana de introducción del nombre
+   * del usuario.
+   *
+   */
+  void client_name_window();
+  
   /**
    * Muestra la ventana principal del cliente.
    *
