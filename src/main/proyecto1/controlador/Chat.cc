@@ -16,10 +16,6 @@ std::thread Chat::get_thread_h() {
   return move(h);
 }
 
-std::thread Chat::get_thread_wrt() {
-  return move(wrt);
-}
-   
 std::thread Chat::get_thread_rcv() {
   return move(rcv);
 }
@@ -68,58 +64,50 @@ int Chat::inicia_servidor(int puerto) {//ejecuta_servidor
   servidor = new Servidor(puerto);
   int tamano_cola = 10;
     
-  if (servidor->servidor_socket() < 0) {
+  if (servidor->servidor_socket() == -1) {
     vista_servidor->window_socket_error();
     return -1;
   }
     
-  if (servidor->servidor_bind() < 0) {
+  if (servidor->servidor_bind() !=  0) {
     vista_servidor->window_bind_error();
     return -1;
   }
 
-  if (servidor->servidor_listen(tamano_cola) < 0) {
+  if (servidor->servidor_listen(tamano_cola) == -1) {
     vista_servidor->window_listen_error();
     return -1;
   }
 
   gtk_widget_hide(vista_servidor->get_welcome_widget());
   
-  h = std::thread (&Chat::ejecuta_servidor, this, servidor);
+  h = std::thread (&Chat::ejecuta_servidor, this);
   vista_servidor->server_window();
 
   return 0;
 }
 
-void Chat::ejecuta_servidor(Servidor* servidor) {
+void Chat::ejecuta_servidor() {
   
   while(true) {
-
     int client_socket = servidor->servidor_accept();
     if (client_socket == -1)
       vista_servidor->window_accept_error();
-    
-    servidor->set_text_buffer(gtk_text_view_get_buffer
-			      (GTK_TEXT_VIEW(vista_servidor->get_text_box())));    
 
+    servidor->set_text_buffer(gtk_text_view_get_buffer
+			      (GTK_TEXT_VIEW(vista_servidor->get_text_box())));  
     servidor->set_seed();
     int seed = servidor->get_seed();
     Usuario* usuario = new Usuario(seed, client_socket);
     std::thread t = servidor->crea_hilo(usuario);
-    usuario->set_thread(move(t));
-    
-    // while (gtk_events_pending())
-    //   gtk_main_iteration();
-        
-    if (servidor->get_read_status() < 0)
-      vista_servidor->window_read_error();
+    usuario->set_thread(std::move(t));
+
+    while (gtk_events_pending())
+      gtk_main_iteration();
 
     if (servidor->get_write_status() < 0)
       vista_servidor->window_send_error();
   }
-
-  servidor->termina_ejecucion();
-
 }
 
 void Chat::termina_servidor() {
@@ -138,26 +126,22 @@ int Chat::inicia_cliente(int puerto, const char * ip) {
 
   gtk_widget_hide(vista_cliente->get_welcome_widget());
   vista_cliente->client_name_window();
-
   
-  std::string username_str = vista_cliente->get_username();
-  char* username = new char[username_str.length() + 1];
-  strcpy(username, username_str.c_str());
-  
-  cliente->cliente_write_identify(username);
-  
-  
-  vista_cliente->client_window();
-  
+  client_name = vista_cliente->get_username();
+  char* client_name_id = new char[client_name.length() + 1];
+  strcpy(client_name_id, client_name.c_str());
+  cliente->cliente_write_identify(client_name_id);
+  rcv = cliente->crea_hilo_recv();
+  vista_cliente->client_window(cliente);
   cliente->set_text_buffer(gtk_text_view_get_buffer
 			    (GTK_TEXT_VIEW(vista_cliente->get_text_box())));
-  
-  // wrt = std::thread (&Cliente::cliente_write_message, cliente,
-  // 		  username_str, vista_cliente->get_message_data());
-  rcv = std::thread (&Cliente::recv_messages, cliente);  
-  rcv.join();
-  delete []username;
+
+  delete [] client_name_id;  
   return 0;
+}
+
+void Chat::cliente_envia_mensaje_publico(std::string message) {
+  cliente->cliente_write_message(client_name, message);
 }
 
 bool Chat::valida_cliente(Cliente* cliente) {

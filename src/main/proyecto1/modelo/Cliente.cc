@@ -1,5 +1,6 @@
 #pragma GCC diagnostic ignored "-Wswitch" // No se usarán todos miembros del enum Protocolo
 #include "inc/Cliente.h"
+#include <condition_variable>
 
 bool Cliente::bandera_salida = false;
 
@@ -35,8 +36,16 @@ struct hostent * Cliente::get_servidor() {
   return this->servidor; 
 }
 
+bool Cliente::get_bool_interface() {
+  return this->interface;
+}
+
 void Cliente::set_text_buffer(GtkTextBuffer* text_buffer) {
   this->text_buffer = text_buffer;
+}
+
+void Cliente::set_bool_interface(bool interface) {
+  this->interface = interface;
 }
 
 int Cliente::cliente_connect() {
@@ -47,13 +56,15 @@ int Cliente::cliente_connect() {
 
 int Cliente::cliente_write_message(std::string username,
 				   std::string message) {
+  if (message.empty())
+    return -1;
   std::string str_message = procesador.write_message_public_message(username,
 								    message);
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
 }
 
-int Cliente::cliente_write_identify(std::string message) {
+int Cliente::cliente_write_identify(char * message) {
   std::string str_message = procesador.write_message_new_user(message);
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
@@ -68,11 +79,14 @@ void Cliente::cliente_close() {
   close(m_socket);
 }
 
-void Cliente::send_messages() {
+std::thread Cliente::crea_hilo_recv() {
+  std::thread t(&Cliente::recv_messages, this);
+  return t;
 }
 
 void Cliente::recv_messages() {
   // Variables para usarse dentro de while
+  std::cout<<"Recibiendo mensajes..."<<std::endl;
   std::string message;
   std::string username;
   std::string status;
@@ -81,10 +95,16 @@ void Cliente::recv_messages() {
   std::list<std::string>::iterator i;
   
   GtkTextIter iter;
+
+
+  std::unique_lock lk(m);
+  
+  cv.wait(lk, [this]{return interface;});
   gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
   gtk_text_buffer_create_tag(text_buffer, "lmarg", 
 			     "left_margin", 5, NULL);  
-  
+  lk.unlock();
+      
   while (true) {
     if (cliente_read() <= 0)
       continue;
@@ -95,6 +115,10 @@ void Cliente::recv_messages() {
     std::list<std::string> recvd_message = (procesador.*parse)
       (std::string(get_buffer_recv()));
 
+    for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
+      std::cout<<*i<<std::endl;
+    }
+    
     switch (protocolo) {
     case NEW_USER:
       username = recvd_message.front();
@@ -120,8 +144,11 @@ void Cliente::recv_messages() {
 					       -1, NULL, "lmarg",  NULL);
       break;
     case PUBLIC_MESSAGE_FROM:
+      std::cout<<"Se recibió mensaje público"<<std::endl;
       username = recvd_message.front();
       message = recvd_message.back();
+      std::cout<<"Username: "<<std::endl<<username<<"Message: "<<message<<std::endl;
+      std::cout<<"Username: "<<username<<std::endl<<"Message: "<<message<<std::endl;
       gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
 					       (username + ": " + message).c_str(),
 					       -1, NULL, "lmarg",  NULL);
@@ -176,8 +203,4 @@ void Cliente::recv_messages() {
   }
 }
 
-
-
-Cliente::~Cliente() {
-  delete(servidor);
-}
+Cliente::~Cliente() {}

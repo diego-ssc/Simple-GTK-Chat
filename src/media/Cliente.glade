@@ -21,16 +21,49 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="hexpand">True</property>
+            <property name="title" translatable="yes">Chat</property>
             <property name="show-close-button">True</property>
-            <child type="title">
-              <object class="GtkLabel" id="Title">
+            <child>
+              <object class="GtkButton" id="show_user_list">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Chat</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="halign">end</property>
+                <property name="valign">start</property>
+                <property name="margin-right">4</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">False</property>
+                <signal name="clicked" handler="client_hide_show_user_list" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="icon-name">format-justify-fill-symbolic</property>
+                  </object>
+                </child>
               </object>
+              <packing>
+                <property name="pack-type">end</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="room_factory">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="create_room" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="icon-name">list-add</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="pack-type">end</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
           <packing>
@@ -69,30 +102,6 @@
                 <property name="column-spacing">8</property>
                 <property name="row-homogeneous">True</property>
                 <property name="column-homogeneous">True</property>
-                <child>
-                  <object class="GtkButton" id="show_user_list">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="halign">end</property>
-                    <property name="valign">start</property>
-                    <property name="margin-right">4</property>
-                    <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
-                    <signal name="clicked" handler="client_hide_show_user_list" swapped="no"/>
-                    <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="icon-name">format-justify-fill-symbolic</property>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="left-attach">2</property>
-                    <property name="top-attach">0</property>
-                  </packing>
-                </child>
                 <child>
                   <object class="GtkScrolledWindow">
                     <property name="visible">True</property>
@@ -143,8 +152,8 @@
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
-                    <property name="top-attach">1</property>
-                    <property name="height">2</property>
+                    <property name="top-attach">0</property>
+                    <property name="height">3</property>
                   </packing>
                 </child>
                 <child>
@@ -181,23 +190,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="room_factory">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <signal name="clicked" handler="create_room" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">list-add</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="left-attach">1</property>
-            <property name="top-attach">2</property>
-          </packing>
+          <placeholder/>
         </child>
         <child>
           <placeholder/>

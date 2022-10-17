@@ -8,14 +8,12 @@ extern "C" {
   G_MODULE_EXPORT void server_send_data() {
     Vista_Servidor* vista = Vista_Servidor::get_instance();
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_servidor(atoi(vista->get_port_data()));
   }
 
   G_MODULE_EXPORT void server_enter_signal_send_data() {
     Vista_Servidor* vista = Vista_Servidor::get_instance();
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));
-    gtk_widget_hide(vista->get_welcome_widget());
     Chat::get_instance()->inicia_servidor(atoi(vista->get_port_data()));
   }
   

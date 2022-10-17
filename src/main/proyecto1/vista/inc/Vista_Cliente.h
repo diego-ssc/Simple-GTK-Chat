@@ -38,8 +38,6 @@ class Vista_Cliente {
   const char* ip_data;
   /** Puerto registrada por el usuario */
   const char* port_data;
-  /** Mensaje registrdo por el usuario */
-  std::string message_data;
   /** Nombre de la sala a crear */
   std::string room_name;
   /** Nombre del usuario */
@@ -137,13 +135,6 @@ public:
   void set_port_data(const char* port_data);
 
   /**
-   * Define el mensaje registrado del cliente.
-   * @param message_data El mensaje que mandará el cliente
-   *
-   */
-  void set_message_data(std::string message_data);
-
-  /**
    * Define el nombre de sala registrado del cliente.
    * @param room_name El nombre de sala 
    *
@@ -177,13 +168,6 @@ public:
    *
    */
   const char* get_port_data();
-
-  /**
-   * Devuelve el mensaje registrado del cliente.
-   * @return El mensaje del cliente
-   *
-   */ 
-  std::string get_message_data();
 
   /**
    * Devuelve el nombre de sala registrado del cliente.
@@ -305,7 +289,7 @@ public:
    * Muestra la ventana principal del cliente.
    *
    */
-  void client_window();
+  void client_window(Cliente* cliente);
 
   /**
    * Muestra una ventana de diálogo en caso de

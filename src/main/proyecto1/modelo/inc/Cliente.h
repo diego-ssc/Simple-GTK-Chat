@@ -41,9 +41,15 @@ class Cliente {
   /** El objeto que guarda los mensajes que
       se mostrarán en la vista del cliente. */
   GtkTextBuffer* text_buffer;
+  /** Determinarán cuándo se inicia la interfaz */
+  std::mutex m;
+  bool interface = false;
+
   
 public:
 
+  /** Determinará cuándo se inicia la interfaz */
+  std::condition_variable cv;
   char nombre[256];
   static bool bandera_salida;
   std::thread hilo_envio, hilo_recepcion;
@@ -86,6 +92,22 @@ public:
   struct hostent * get_servidor();
 
   /**
+   * Devuelve la variable condicional asociada
+   * a la inicialización de la interfaz.
+   * @return La variable condicional asociada
+   * a la inicialización de la interfaz.
+   *
+   */
+  std::condition_variable get_condition_variable();
+
+  /**
+   * Devuelve true, si la interfaz ha sido inicializada;
+   * false, en otro caso.
+   *
+   */
+  bool get_bool_interface();
+
+  /**
    * Devuelve el objeto que guarda los mensajes
    * mostrados al cliente.
    * @param El objeto que guarda los mensajes
@@ -93,6 +115,15 @@ public:
    *
    */
   void set_text_buffer(GtkTextBuffer* text_buffer);
+
+
+  /**
+   * Define el estado de la interfaz.
+   * @param interface true, si la interfaz
+   * ha sido inicializada; false, en otro caso.
+   *
+   */
+  void set_bool_interface(bool interface);
   
   /**
    * Conecta el socket del cliente al socket del servidor.
@@ -101,7 +132,7 @@ public:
    *
    */
   int cliente_connect();
-
+  
   /**
    * Envía el mensaje público del usuario al servidor.
    * @param message El mensaje a enviar
@@ -119,7 +150,7 @@ public:
    * -1, en otro caso
    *
    */
-  int cliente_write_identify(std::string message);
+  int cliente_write_identify(char* message);
   
   /**
    * Lee los datos recibidos en el socket del cliente.
@@ -135,6 +166,15 @@ public:
    */
   void cliente_close();
 
+  /**
+   * Crea el hilo de ejecución para el
+   * recibo de mensajes.
+   * @return El hilo de ejecución para el
+   * recibo de mensajes.
+   *
+   */
+  std::thread crea_hilo_recv();
+  
   /**
    * Envía mensaje a todos los clientes..
    *

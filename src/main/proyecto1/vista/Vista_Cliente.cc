@@ -27,9 +27,8 @@ extern "C" {
   G_MODULE_EXPORT void client_exit_app() {
     gtk_main_quit();
     Chat* chat = Chat::get_instance();
-    // delete chat->get_cliente();
-    // chat->get_thread_wrt().detach();
-    // chat->get_thread_rcv().detach();
+    delete chat->get_cliente();
+    chat->get_thread_rcv().detach();
     delete chat;
     exit(1);
   }
@@ -41,13 +40,17 @@ extern "C" {
 
   G_MODULE_EXPORT void enter_icon() {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
-    vista->set_message_data(gtk_entry_get_text(GTK_ENTRY(vista->get_message_entry())));
+    Chat* chat = Chat::get_instance();
+    chat->cliente_envia_mensaje_publico(gtk_entry_get_text
+					    (GTK_ENTRY(vista->get_message_entry())));
     gtk_entry_set_text (GTK_ENTRY(vista->get_message_entry()), "");
   }
 
   G_MODULE_EXPORT void enter_signal() {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
-    vista->set_message_data(gtk_entry_get_text(GTK_ENTRY(vista->get_message_entry())));
+    Chat* chat = Chat::get_instance();
+    chat->cliente_envia_mensaje_publico(gtk_entry_get_text
+					    (GTK_ENTRY(vista->get_message_entry())));
     gtk_entry_set_text (GTK_ENTRY(vista->get_message_entry()), "");
   }
 
@@ -134,10 +137,6 @@ void Vista_Cliente::set_port_data(const char* port_data) {
   this->port_data = port_data;
 }
 
-void Vista_Cliente::set_message_data(std::string message_data) {
-  this->message_data = message_data;
-}
-
 void Vista_Cliente::set_room_name(std::string room_name) {
   this->room_name = room_name;
 }
@@ -167,10 +166,6 @@ const char* Vista_Cliente::get_ip_data() {
 
 const char* Vista_Cliente::get_port_data() {
   return this->port_data;
-}
-
-std::string Vista_Cliente::get_message_data() {
-  return this->message_data;
 }
 	     
 std::string Vista_Cliente::get_room_name() {
@@ -275,7 +270,7 @@ void Vista_Cliente::client_name_window() {
   gtk_widget_destroy(name_dialog);   
 }
 
-void Vista_Cliente::client_window() {
+void Vista_Cliente::client_window(Cliente * cliente) {
   builder = gtk_builder_new();
   gtk_builder_add_from_file(builder, "../src/media/Cliente.glade", &err);
 
@@ -328,6 +323,8 @@ void Vista_Cliente::client_window() {
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(window);
   gtk_widget_hide(user_list_container);
+  cliente->set_bool_interface(true);
+  cliente->cv.notify_one();
   gtk_main();
 }
 

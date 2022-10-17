@@ -45,12 +45,14 @@ protected:
    y la ejecución principal de este. */
   std::thread h;
   /** Hilos de ejecución para el envío
-   y la recpeción de mensajes del cliente. */
-  std::thread wrt, rcv;
+   y la recrpción de mensajes del cliente. */
+  std::thread rcv;
   /** Servidor de la aplicación */
   Servidor* servidor;
   /** Cliente de la aplicación */
   Cliente* cliente;
+  /** Nombre asociado al cliente */
+  std::string client_name;
   
  public:
   
@@ -114,15 +116,6 @@ protected:
    *
    */   
   std::thread get_thread_h();
-
-  /**
-   * Devuelve el hilo de ejecución de envío de mensajes
-   * del cliente.
-   * @return El hilo de ejecución de envío de mensajes
-   * del cliente.
-   *
-   */   
-  std::thread get_thread_wrt();
 
   /**
    * Devuelve el hilo de ejecución de recepción de mensajes
@@ -205,7 +198,7 @@ protected:
    * Hace que el servidor espere indefinidamente las
    * solicitudes de conexión.
    */  
-  void ejecuta_servidor(Servidor* servidor);
+  void ejecuta_servidor();
 
   /**
    * Cierra el socket del servidor y termina los hilos
@@ -216,10 +209,18 @@ protected:
   
   /**
    * Inicia el cliente.
-   * @return 0, si la ejecución terminó correctamente
+   * @return 0, si la ejecución terminó correctamente;
+   * -1, en otro caso.
    */  
   int inicia_cliente(int puerto, const char * ip);
 
+  /**
+   * Envía un mensaje público desde el cliente.
+   * @param message El mensaje a enviar.
+   *
+   */
+  void cliente_envia_mensaje_publico(std::string message);
+  
   /**
    * Asegura que el cliente creado sea una instancia
    * válida.

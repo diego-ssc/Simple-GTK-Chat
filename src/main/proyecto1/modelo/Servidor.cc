@@ -107,10 +107,13 @@ void Servidor::global_message(std::string message) {
 
 void Servidor::global_message_from(std::string message,
 				   int sender_id) {
+  std::cout<<"Mensaje global (de): "<<message<<std::endl;
   char temp[MAX_LEN];
   strcpy(temp, message.c_str());
+  std::cout<<"Mensaje global (de)[temp]: "<<temp<<std::endl;
   std::map<std::string, Usuario*>::iterator i;
   for (i = usuarios.begin(); i != usuarios.end(); ++i) {
+    std::cout<<"Nombre usuario: "<<i->second->get_name()<<std::endl;
     if(i->second->get_id() == sender_id) continue;
     if(servidor_send(i->second->get_socket(), temp))
       write_status = -1;
@@ -125,23 +128,27 @@ void Servidor::send_message_to(std::string message, int socket) {
 }
 
 void Servidor::administra_cliente(Usuario* usuario) {
-  int client_socket = usuario->get_socket();
-  int id = usuario-> get_id();
+  int client_socket;
+  int id;
   std::string name;
   
   while (true) {
-    if (servidor_read(client_socket) < 0)
+    client_socket = usuario->get_socket();
+    id = usuario-> get_id();
+    if (servidor_read(client_socket) == -1)
       read_status = -1;
     
     Procesador_Servidor procesador;
     std::list<std::string>(Procesador::*procesador_parse)(std::string) =
       Fabrica_Procesadores::recv_protocol(Protocolo::IDENTIFY);
-    std::list<std::string> name_list = (procesador.*procesador_parse)(std::string(get_host_buffer()));
+    std::list<std::string> name_list = (procesador.*procesador_parse)
+      (std::string(get_host_buffer()));
     
     usuario->set_name(name_list.front());
     name = usuario->get_name();
     std::map<std::string, Usuario*>::iterator i;
     i = usuarios.find(name);
+    
     if (i != usuarios.end()) {
       std::string id_failure = procesador.write_message_id_failure(name);
       send_message_to(id_failure, usuario->get_socket());
@@ -149,16 +156,16 @@ void Servidor::administra_cliente(Usuario* usuario) {
     }
     break;
   }
-
-  std::lock_guard<std::mutex> guard(client_mutex);
-  usuarios[name] = std::move(usuario);// Revisar *
-
+  
+  client_mutex.lock();
+  usuarios[name] = std::move(usuario);
+  client_mutex.unlock();
   GtkTextIter iter;
   gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
   gtk_text_buffer_create_tag(text_buffer, "lmarg", 
 			     "left_margin", 5, NULL);
   gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
-					   (name + " se ha conectado").c_str(),
+					   (name + " se ha conectado\n").c_str(),
 					   -1, NULL, "lmarg",  NULL);
   
   std::string(Procesador::*procesador_write_one)(std::string) = 
@@ -227,7 +234,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 			client_socket);
       break;
     case PUBLIC_MESSAGE:
-      message = (procesador.*write_two_arguments)(name, recvd_message.front());
+      message = (procesador.*write_two_arguments)(name, recvd_message.back());
       global_message_from(message, id);
       break;
     case NEW_ROOM:

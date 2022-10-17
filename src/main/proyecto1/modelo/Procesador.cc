@@ -58,6 +58,7 @@ Protocolo Procesador::get_type(std::string message) {
 
 void Procesador::parse_message(std::string message) {
   vacia_json();
+  std::cout<<message<<std::endl;
   if(!this->reader.parse(message, this->parsed_message))
     error("Error: No se ha recibido un json válido.");
 }
