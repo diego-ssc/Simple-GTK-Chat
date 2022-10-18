@@ -46,7 +46,7 @@ class Vista_Cliente {
   static Vista_Cliente* vista_cliente;
   /** El widget de registro de mensajes */
   GtkWidget *text_box;
-  
+
   /**
    * Constructor de la clase Vista_Cliente.
    * @param argc El número de argumentos pasados a la aplicación

@@ -24,7 +24,7 @@ Procesador_Cliente Cliente::get_procesador() {
   return this->procesador;
 }
 
-char * Cliente::get_buffer_recv() {
+char* Cliente::get_buffer_recv() {
   return this->buffer_recv;
 }
 
@@ -71,8 +71,8 @@ int Cliente::cliente_write_identify(char * message) {
 }
 
 int Cliente::cliente_read() {
-  bzero(buffer_recv, 1024);
-  return read(m_socket, this->buffer_recv, 1024);
+  bzero(buffer_recv, sizeof(buffer_recv));
+  return recv(m_socket, buffer_recv, sizeof(buffer_recv), 0);
 }
 
 void Cliente::cliente_close() {
@@ -86,7 +86,6 @@ std::thread Cliente::crea_hilo_recv() {
 
 void Cliente::recv_messages() {
   // Variables para usarse dentro de while
-  std::cout<<"Recibiendo mensajes..."<<std::endl;
   std::string message;
   std::string username;
   std::string status;
@@ -95,35 +94,26 @@ void Cliente::recv_messages() {
   std::list<std::string>::iterator i;
   
   GtkTextIter iter;
-
-
-  std::unique_lock lk(m);
   
   cv.wait(lk, [this]{return interface;});
   gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
   gtk_text_buffer_create_tag(text_buffer, "lmarg", 
-			     "left_margin", 5, NULL);  
+			     "left_margin", 5, NULL);
   lk.unlock();
       
   while (true) {
     if (cliente_read() <= 0)
       continue;
-    
     Protocolo protocolo = procesador.get_type(get_buffer_recv());
     std::list<std::string>(Procesador::*parse)(std::string) =
       Fabrica_Procesadores::recv_protocol(protocolo);
     std::list<std::string> recvd_message = (procesador.*parse)
       (std::string(get_buffer_recv()));
-
-    for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
-      std::cout<<*i<<std::endl;
-    }
-    
     switch (protocolo) {
     case NEW_USER:
       username = recvd_message.front();
       gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
-					       (username + " se ha conectado").c_str(),
+					       (username + " se ha conectado\n").c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
     case NEW_STATUS:
@@ -144,13 +134,10 @@ void Cliente::recv_messages() {
 					       -1, NULL, "lmarg",  NULL);
       break;
     case PUBLIC_MESSAGE_FROM:
-      std::cout<<"Se recibió mensaje público"<<std::endl;
       username = recvd_message.front();
       message = recvd_message.back();
-      std::cout<<"Username: "<<std::endl<<username<<"Message: "<<message<<std::endl;
-      std::cout<<"Username: "<<username<<std::endl<<"Message: "<<message<<std::endl;
       gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
-					       (username + ": " + message).c_str(),
+					       (username + ": " + message + "\n").c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
     case INVITATION:
@@ -161,7 +148,7 @@ void Cliente::recv_messages() {
       roomname = recvd_message.front(); //Acceder a stack de cuarto
       username = recvd_message.back();
       gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
-					       (username + " se ha unido").c_str(),
+					       (username + " se ha unido\n").c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
     case ROOM_USER_LIST:
@@ -184,6 +171,7 @@ void Cliente::recv_messages() {
       gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
 					       (username + "se ha desconectado").c_str(),
 					       -1, NULL, "lmarg",  NULL);
+
       break;
     case DISCONNECTED:
       username = recvd_message.front();
@@ -192,11 +180,11 @@ void Cliente::recv_messages() {
 					       -1, NULL, "lmarg",  NULL);
       break;
     case INFO:// dialog con operación relacionada
-      return;
+      break;
     case WARNING:
-      return;
+      break;
     case ERROR:
-      return;
+      break;
     }
      
     

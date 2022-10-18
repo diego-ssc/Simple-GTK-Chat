@@ -133,8 +133,6 @@ int Chat::inicia_cliente(int puerto, const char * ip) {
   cliente->cliente_write_identify(client_name_id);
   rcv = cliente->crea_hilo_recv();
   vista_cliente->client_window(cliente);
-  cliente->set_text_buffer(gtk_text_view_get_buffer
-			    (GTK_TEXT_VIEW(vista_cliente->get_text_box())));
 
   delete [] client_name_id;  
   return 0;

@@ -1,17 +1,17 @@
 #include "inc/Procesador_Cliente.h"
 
   std::unordered_map<Protocolo, std::string, EnumClassHash>
-  const Procesador_Cliente::table_protocolo = { {Protocolo::NEW_USER, "IDENTIFY"},
-						{Protocolo::NEW_STATUS, "STATUS"},
-						{Protocolo::USER_LIST, "USERS"},
-						{Protocolo::MESSAGE_FROM, "MESSAGE"},
-						{Protocolo::PUBLIC_MESSAGE_FROM, "PUBLIC_MESSAGE"},
+  const Procesador_Cliente::table_protocolo = { {Protocolo::NEW_USER, "NEW_USER"},
+						{Protocolo::NEW_STATUS, "NEW_STATUS"},
+						{Protocolo::USER_LIST, "USER_LIST"},
+						{Protocolo::MESSAGE_FROM, "MESSAGE_FROM"},
+						{Protocolo::PUBLIC_MESSAGE_FROM, "PUBLIC_MESSAGE_FROM"},
 						{Protocolo::INVITATION, "INVITATION"},
-						{Protocolo::JOINED_ROOM, "NEW_ROOM"},
-						{Protocolo::ROOM_USER_LIST, "INVITE"},
-						{Protocolo::ROOM_MESSAGE_FROM, "JOIN_ROOM"},
-						{Protocolo::LEFT_ROOM, "ROOM_USERS"},
-						{Protocolo::DISCONNECTED, "ROOM_MESSAGE"}};
+						{Protocolo::JOINED_ROOM, "JOINED_ROOM"},
+						{Protocolo::ROOM_USER_LIST, "ROOM_USER_LIST"},
+						{Protocolo::ROOM_MESSAGE_FROM, "ROOM_MESSAGE_FROM"},
+						{Protocolo::LEFT_ROOM, "LEFT_ROOM"},
+						{Protocolo::DISCONNECTED, "DISCONNECTED"}};
 
 /**
  * Devolverá una lista para homogeneizar la el tipo devuelto en los métodos

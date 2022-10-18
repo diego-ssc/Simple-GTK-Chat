@@ -53,7 +53,7 @@ class Servidor {
   char host_buffer[1024];
   /** Registra el número de clientes; además, funge como identificador
       de los mismos. */
-  int seed;
+  int seed = 0;
   
   Procesador_Servidor procesador;
   

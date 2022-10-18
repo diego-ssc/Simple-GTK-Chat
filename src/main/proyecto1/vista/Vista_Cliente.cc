@@ -261,16 +261,12 @@ void Vista_Cliente::client_name_window() {
 				  G_CALLBACK(name_button_clicked));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
-  // gtk_widget_set_parent_window(name_dialog, (GdkWindow*) welcome);
-  // gtk_window_set_destroy_with_parent(GTK_WINDOW(name_dialog), false);
-  // gtk_window_set_transient_for(GTK_WINDOW(name_dialog), GTK_WINDOW(welcome));
-  // gtk_window_set_position(GTK_WINDOW(name_dialog), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_window_set_position(GTK_WINDOW(name_dialog), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_dialog_run(GTK_DIALOG(name_dialog));
   gtk_widget_destroy(name_dialog);   
 }
 
-void Vista_Cliente::client_window(Cliente * cliente) {
+void Vista_Cliente::client_window(Cliente* cliente) {
   builder = gtk_builder_new();
   gtk_builder_add_from_file(builder, "../src/media/Cliente.glade", &err);
 
@@ -324,7 +320,9 @@ void Vista_Cliente::client_window(Cliente * cliente) {
   gtk_widget_show_all(window);
   gtk_widget_hide(user_list_container);
   cliente->set_bool_interface(true);
-  cliente->cv.notify_one();
+  cliente->set_text_buffer(gtk_text_view_get_buffer
+			   (GTK_TEXT_VIEW(vista_cliente->get_text_box())));
+  cv.notify_one();
   gtk_main();
 }
 
@@ -392,6 +390,7 @@ void Vista_Cliente::window_room_creation() {
 				  G_CALLBACK(room_dialog_enter_signal));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
+  gtk_window_set_position(GTK_WINDOW(welcome), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(room_dialog);
 }
 

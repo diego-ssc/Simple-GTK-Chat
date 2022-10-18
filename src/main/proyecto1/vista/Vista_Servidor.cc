@@ -4,7 +4,6 @@ Vista_Servidor* Vista_Servidor::vista_servidor = nullptr;
 
 extern "C" {
   //Senales
-
   G_MODULE_EXPORT void server_send_data() {
     Vista_Servidor* vista = Vista_Servidor::get_instance();
     vista->set_port_data(gtk_entry_get_text(GTK_ENTRY(vista->get_port_entry())));

@@ -79,7 +79,9 @@ int Servidor::servidor_accept() {
 }
 
 int Servidor::servidor_send(int descriptor_archivo, char * message) {
-  return send(descriptor_archivo, message, sizeof(message), 0);
+  // sizeof(message) es menor a 1024
+  // si es usado en send, mandará un mensaje cortado
+  return send(descriptor_archivo, message, 1024, 0);
 }
 
 int Servidor::servidor_read(int descriptor_archivo) {
@@ -88,7 +90,6 @@ int Servidor::servidor_read(int descriptor_archivo) {
   int status = read(descriptor_archivo, this->host_buffer, tamano_buffer);
 
   return status;
-
 }
 
 void Servidor::servidor_close(int descriptor_archivo) {
@@ -107,21 +108,24 @@ void Servidor::global_message(std::string message) {
 
 void Servidor::global_message_from(std::string message,
 				   int sender_id) {
-  std::cout<<"Mensaje global (de): "<<message<<std::endl;
   char temp[MAX_LEN];
   strcpy(temp, message.c_str());
-  std::cout<<"Mensaje global (de)[temp]: "<<temp<<std::endl;
   std::map<std::string, Usuario*>::iterator i;
+  printf("Mensaje devuelto: %s", temp);
   for (i = usuarios.begin(); i != usuarios.end(); ++i) {
     std::cout<<"Nombre usuario: "<<i->second->get_name()<<std::endl;
+    std::cout<<"Socket: "<<i->second->get_socket()<<std::endl;
+    std::cout<<"ID: "<<i->second->get_id()<<std::endl<<std::endl<<std::endl;
+    std::cout<<"Sender id: "<<sender_id<<std::endl;
     if(i->second->get_id() == sender_id) continue;
-    if(servidor_send(i->second->get_socket(), temp))
+    if(servidor_send(i->second->get_socket(), temp) < 0)
       write_status = -1;
   }
 }
 
 void Servidor::send_message_to(std::string message, int socket) {
   char temp[MAX_LEN];
+  std::cout<<"Socket: "<<socket<<std::endl;
   strcpy(temp, message.c_str());
   if(servidor_send(socket, temp) < 0)
     write_status = -1;

@@ -20,6 +20,11 @@
 #include "Procesador_Cliente.h"
 #include "Fabrica_Procesadores.h"
 
+inline std::condition_variable cv;
+/** Determinarán cuándo se inicia la interfaz */
+inline std::mutex m;
+inline std::unique_lock lk(m);
+
 class Cliente {
 
   /** La dirección del servidor asociado
@@ -41,18 +46,14 @@ class Cliente {
   /** El objeto que guarda los mensajes que
       se mostrarán en la vista del cliente. */
   GtkTextBuffer* text_buffer;
-  /** Determinarán cuándo se inicia la interfaz */
-  std::mutex m;
+
   bool interface = false;
 
-  
 public:
 
-  /** Determinará cuándo se inicia la interfaz */
-  std::condition_variable cv;
+  /** Guarda el nombre del cliente */
   char nombre[256];
   static bool bandera_salida;
-  std::thread hilo_envio, hilo_recepcion;
 
   /**
    * Método constructor de la clase Cliente.
@@ -82,7 +83,7 @@ public:
    * @return El buffer de recepción del cliente.
    *
    */
-  char * get_buffer_recv();
+  char* get_buffer_recv();
 
   /**
    * Devuelve el servidor asociado al cliente.
@@ -90,15 +91,6 @@ public:
    *
    */
   struct hostent * get_servidor();
-
-  /**
-   * Devuelve la variable condicional asociada
-   * a la inicialización de la interfaz.
-   * @return La variable condicional asociada
-   * a la inicialización de la interfaz.
-   *
-   */
-  std::condition_variable get_condition_variable();
 
   /**
    * Devuelve true, si la interfaz ha sido inicializada;
