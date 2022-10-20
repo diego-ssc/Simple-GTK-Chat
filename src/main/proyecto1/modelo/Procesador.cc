@@ -68,7 +68,6 @@ std::list<std::string> Procesador::parse_message_response(std::string message) {
   verifica_miembro(Sintaxis::type);
   verifica_miembro(Sintaxis::message);
   std::list<std::string> lista;
-  lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::type)].asString());
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::message)].asString());  
   return lista;
 }

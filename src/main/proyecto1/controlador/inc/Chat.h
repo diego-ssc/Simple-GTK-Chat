@@ -220,6 +220,24 @@ protected:
    *
    */
   void cliente_envia_mensaje_publico(std::string message);
+
+  /**
+   * Manda la petición de creación de cuarto desde
+   * el cliente.
+   * @param roomname El nombre del cuarto.
+   *
+   */
+  void cliente_crea_cuarto(std::string roomname);
+
+  /**
+   * Verifica la respuesta obtenida del servidor,
+   * al mandar una petición previa desde el cliente.
+   * @return 0, si la respuesta es de información;
+   * 1, si es de advertencia; 2, si es de error;
+   * -1, en otro caso.
+   *
+   */
+  int verifica_respuesta();
   
   /**
    * Asegura que el cliente creado sea una instancia

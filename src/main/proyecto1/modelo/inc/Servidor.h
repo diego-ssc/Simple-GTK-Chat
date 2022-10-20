@@ -64,7 +64,7 @@ class Servidor {
    *
    */
   std::map<std::string, Usuario*> usuarios;
-  std::map<std::string, Cuarto> cuartos;
+  std::map<std::string, Cuarto*> cuartos;
   
 public:
 

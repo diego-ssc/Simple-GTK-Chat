@@ -46,6 +46,14 @@ class Cliente {
   /** El objeto que guarda los mensajes que
       se mostrarán en la vista del cliente. */
   GtkTextBuffer* text_buffer;
+  /** El objeto que accede a al búfer del cliente */
+  GtkTextIter iter;
+  /** 0, si el servidor responde con un mensaje
+      de información; 1, si fue de advertencia;
+      2, en otro caso. */
+  int response = -1;
+  /** Guarda el mensaje de respuesta del servidor */
+  std::string response_str;
 
   bool interface = false;
 
@@ -98,7 +106,24 @@ public:
    *
    */
   bool get_bool_interface();
+  
+  /**
+   * Devuelve un entero que indica si la respuesta
+   * del servidor fue de información, advertencia
+   * o error.
+   * @return 0, si se trata de un mensaje de información;
+   * 1, si fue de advertencia; 2, en otro caso.
+   *
+   */
+  int get_response();
 
+  /**
+   * Devuelve el mensaje de respuesta del servidor.
+   * @return El mensaje de respuesta del servidor.
+   *
+   */
+  std::string get_str_response();
+  
   /**
    * Devuelve el objeto que guarda los mensajes
    * mostrados al cliente.
@@ -128,7 +153,7 @@ public:
   /**
    * Envía el mensaje público del usuario al servidor.
    * @param message El mensaje a enviar
-   * @return 0, si el mensage fue enviado correctamente;
+   * @return 0, si el mensaje fue enviado correctamente;
    * -1, en otro caso
    *
    */
@@ -138,11 +163,20 @@ public:
   /**
    * Envía el nombre del usuario al servidor.
    * @param message El mensaje a enviar
-   * @return 0, si el mensage fue enviado correctamente;
+   * @return 0, si el mensaje fue enviado correctamente;
    * -1, en otro caso
    *
    */
   int cliente_write_identify(char* message);
+
+  /**
+   * Envía la petición de creación de sala al servidor.
+   * @param message El nombre del cuarto
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_new_room(std::string roomname);
   
   /**
    * Lee los datos recibidos en el socket del cliente.

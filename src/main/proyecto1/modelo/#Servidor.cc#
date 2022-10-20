@@ -189,7 +189,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
   std::string(Procesador::*write_two_arguments)(std::string, std::string);
   std::list<std::string> lista;
   std::map<std::string, Usuario*>::iterator i;
-  std::map<std::string, Cuarto*>::iterator j;
+  std::map<std::string, Cuarto>::iterator j;
   std::list<std::string>::iterator k;
   Cuarto* cuarto;
   int status;
@@ -244,10 +244,10 @@ void Servidor::administra_cliente(Usuario* usuario) {
     case NEW_ROOM:
       roomname = recvd_message.front();
 	j = cuartos.find(roomname);
-      if (j == cuartos.end()) {
+      if (j =1212111111111111= cuartos.end()) {
 	procesador.write_message_new_room_success();
 	cuarto = new Cuarto(roomname);
-	cuartos[roomname] = std::move(cuarto);
+	cuartos[roomname] = std::move(*cuarto);
 	cuarto->add_member(name, usuario);
       }	else 
 	send_message_to(procesador.write_message_new_room_failure(roomname),
@@ -263,7 +263,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 	break;
       }
       
-      cuarto = cuartos.at(roomname);
+      cuarto = &cuartos.at(roomname);
       for (k = recvd_message.begin(); k != recvd_message.end(); ++k) {
 	if (k == recvd_message.begin())
 	  continue;
@@ -292,7 +292,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 	break;
       }
 
-      cuarto = cuartos.at(roomname);
+      cuarto = &cuartos.at(roomname);
       status = cuarto->add_member(usuario->get_name(), usuario); 
       if (status == -1) {
 	send_message_to(procesador.write_message_join_room_failure_joined(roomname),
@@ -320,7 +320,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 			client_socket);
 	break;
       }
-      cuarto = cuartos.at(roomname);
+      cuarto = &cuartos.at(roomname);
       if (!cuarto->is_invited(name)
 	  || (cuarto->is_invited(name)
 	      && !cuarto->is_in(name))) {
@@ -343,7 +343,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 			client_socket);
 	break;
       }
-      cuarto = cuartos.at(roomname);
+      cuarto = &cuartos.at(roomname);
       if (!cuarto->is_invited(name)
 	  || (cuarto->is_invited(name)
 	      && !cuarto->is_in(name))) {
@@ -368,7 +368,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 			client_socket);
 	break;
       }
-      cuarto = cuartos.at(roomname);
+      cuarto = &cuartos.at(roomname);
       if (!cuarto->is_invited(name)
 	  || (cuarto->is_invited(name)
 	      && !cuarto->is_in(name))) {
@@ -390,9 +390,9 @@ void Servidor::administra_cliente(Usuario* usuario) {
     case DISCONNECT:
       message = (procesador.*write_one_arguments)(name);
       for (j = cuartos.begin(); j != cuartos.end(); ++j) {
-	if (j->second->eliminate_member(name) == -1)
+	if (j->second.eliminate_member(name) == -1)
 	  continue;
-	lista = j->second->get_room_usernames();
+	lista = j->second.get_room_usernames();
 	for (k = lista.begin(); k != lista.end(); ++k) {
 	  send_message_to(procesador.write_message_disconnect_new_users(name),
 			  usuarios.at(*k)->get_socket());

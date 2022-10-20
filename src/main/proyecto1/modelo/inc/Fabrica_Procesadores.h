@@ -72,6 +72,9 @@ class Fabrica_Procesadores {
     case ROOM_USER_LIST:
       return static_cast<procesador_write_one>
 	(&Procesador_Cliente::write_message_room_user_list);
+    case NEW_ROOM:
+      return static_cast<procesador_write_one>
+	(&Procesador_Cliente::write_message_new_room);
     case LEFT_ROOM:
       return static_cast<procesador_write_one>
 	(&Procesador_Cliente::write_message_leave_room);

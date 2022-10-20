@@ -71,14 +71,40 @@ extern "C" {
 
   G_MODULE_EXPORT void room_dialog_enter_signal() {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
-    vista->set_room_name(gtk_entry_get_text(vista->get_room_creation_entry()));
+    Chat* chat = Chat::get_instance();
+    const gchar* roomname = gtk_entry_get_text(vista->get_room_creation_entry());
+    chat->cliente_crea_cuarto(roomname);
+    int status = chat->verifica_respuesta();
+    if (status == 0) {
+      vista->rooms_widget(roomname);
+      GtkStack* rooms = vista->get_rooms_stack();
+      GtkWidget* child = vista->get_room_text_box();
+      gtk_stack_add_titled (rooms, child,
+			    roomname, roomname);
+      while (gtk_events_pending())
+	gtk_main_iteration();
+    }
+    
     gtk_entry_set_text (GTK_ENTRY(vista->get_message_entry()), "");
     gtk_window_close(GTK_WINDOW(vista->get_room_dialog()));
   }
   
   G_MODULE_EXPORT void room_dialog_continue_button() {
-    Vista_Cliente* vista = Vista_Cliente::get_instance();
-    vista->set_room_name(gtk_entry_get_text(vista->get_room_creation_entry()));
+        Vista_Cliente* vista = Vista_Cliente::get_instance();
+    Chat* chat = Chat::get_instance();
+    const gchar* roomname = gtk_entry_get_text(vista->get_room_creation_entry());
+    chat->cliente_crea_cuarto(roomname);
+    int status = chat->verifica_respuesta();
+    if (status == 0) {
+      vista->rooms_widget(roomname);
+      GtkStack* rooms = vista->get_rooms_stack();
+      GtkWidget* child = vista->get_room_text_box();
+      gtk_stack_add_titled (rooms, child,
+			    roomname, roomname);
+      while (gtk_events_pending())
+	gtk_main_iteration();
+    }
+    
     gtk_entry_set_text (GTK_ENTRY(vista->get_message_entry()), "");
     gtk_window_close(GTK_WINDOW(vista->get_room_dialog()));
   }
@@ -137,10 +163,6 @@ void Vista_Cliente::set_port_data(const char* port_data) {
   this->port_data = port_data;
 }
 
-void Vista_Cliente::set_room_name(std::string room_name) {
-  this->room_name = room_name;
-}
-
 void Vista_Cliente::set_username(std::string username) {
   this->username = username;
 }
@@ -166,10 +188,6 @@ const char* Vista_Cliente::get_ip_data() {
 
 const char* Vista_Cliente::get_port_data() {
   return this->port_data;
-}
-	     
-std::string Vista_Cliente::get_room_name() {
-  return this->room_name;
 }
 
 std::string Vista_Cliente::get_username() {
@@ -223,6 +241,14 @@ GtkWidget* Vista_Cliente::get_name_dialog() {
 GtkWidget* Vista_Cliente::get_text_box() {
   return this->text_box;
 }
+  
+GtkWidget* Vista_Cliente::get_room_text_box() {
+  return this->room_text_box;
+}
+
+GtkStack* Vista_Cliente::get_rooms_stack() {
+  return this->rooms;
+}
 
 void Vista_Cliente::welcome_window() {
   ip = GTK_ENTRY(gtk_builder_get_object(builder, "ip_entry"));
@@ -275,12 +301,13 @@ void Vista_Cliente::client_window(Cliente* cliente) {
     g_error_free(err);
     exit(1);
   }
-  
+
   message_box = GTK_ENTRY(gtk_builder_get_object(builder, "message_entry"));
   window = GTK_WIDGET(gtk_builder_get_object(builder, "client_window"));
   user_list = GTK_WIDGET(gtk_builder_get_object(builder, "user_list"));
   user_list_container = GTK_WIDGET(gtk_builder_get_object(builder, "user_list_container"));
   text_box = GTK_WIDGET(gtk_builder_get_object(builder, "client_text_box"));
+  rooms = GTK_STACK(gtk_builder_get_object(builder, "rooms"));
   
   if (message_box == NULL) {
     fprintf(stderr, "No ha sido posible extraer widget \"message_entry\".\n");
@@ -307,6 +334,11 @@ void Vista_Cliente::client_window(Cliente* cliente) {
     exit(1);
   }
 
+  if (rooms == NULL) {
+    fprintf(stderr, "No ha sido posible extraer widget \"rooms\".\n");
+    exit(1);
+  }
+
   gtk_builder_add_callback_symbol(builder,"client_exit_app",G_CALLBACK(client_exit_app));
   gtk_builder_add_callback_symbol(builder,"enter_icon",G_CALLBACK(enter_icon));
   gtk_builder_add_callback_symbol(builder,"enter_signal",G_CALLBACK(enter_signal));
@@ -324,6 +356,14 @@ void Vista_Cliente::client_window(Cliente* cliente) {
 			   (GTK_TEXT_VIEW(vista_cliente->get_text_box())));
   cv.notify_one();
   gtk_main();
+}
+
+void Vista_Cliente::rooms_widget(const gchar* roomname) {
+  room_text_box = gtk_scrolled_window_new(NULL, NULL);
+  GtkWidget* text_view = gtk_text_view_new();
+  gtk_widget_set_parent(text_view, room_text_box);
+  gtk_widget_set_name(room_text_box, roomname);
+  gtk_widget_show (room_text_box);
 }
 
 void Vista_Cliente::window_error(const char * error_message, GtkWidget* parent) {
@@ -354,7 +394,7 @@ void Vista_Cliente::window_info(const char * info_message, GtkWidget* parent) {
 					     GTK_MESSAGE_INFO,
 					     GTK_BUTTONS_OK,
 					     info_message);
-  gtk_window_set_title(GTK_WINDOW(dialog), "Information");
+  gtk_window_set_title(GTK_WINDOW(dialog), "Información");
   gtk_dialog_run(GTK_DIALOG(dialog));
   gtk_widget_destroy(dialog);   
 }
@@ -390,7 +430,7 @@ void Vista_Cliente::window_room_creation() {
 				  G_CALLBACK(room_dialog_enter_signal));
   gtk_builder_connect_signals(builder, NULL);
   g_object_unref(builder);
-  gtk_window_set_position(GTK_WINDOW(welcome), GTK_WIN_POS_CENTER_ALWAYS);
+  gtk_window_set_position(GTK_WINDOW(room_dialog), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(room_dialog);
 }
 
@@ -423,3 +463,14 @@ void Vista_Cliente::window_read_error() {
   window_error("Error al leer del socket.", window);
 }
 
+void Vista_Cliente::window_main_error(std::string message) {
+  window_error(message.c_str(), GTK_WIDGET(window));
+}
+
+void Vista_Cliente::window_main_warning(std::string message) {
+  window_warning(message.c_str(), GTK_WIDGET(window));
+}
+
+void Vista_Cliente::window_main_info(std::string message) {
+  window_info(message.c_str(), GTK_WIDGET(window));
+}

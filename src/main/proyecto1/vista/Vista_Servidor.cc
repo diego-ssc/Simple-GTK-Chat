@@ -65,7 +65,7 @@ Vista_Servidor::Vista_Servidor(int argc, char** argv) {
   gtk_builder_add_callback_symbol(builder,
 				  "server_enter_signal_send_data",
 				  G_CALLBACK(server_enter_signal_send_data));
-    gtk_builder_add_callback_symbol(builder,"server_exit_welcome_window",
+  gtk_builder_add_callback_symbol(builder,"server_exit_welcome_window",
 				  G_CALLBACK(server_exit_welcome_window));  
   gtk_builder_connect_signals(builder, NULL);
 }

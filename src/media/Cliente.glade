@@ -10,7 +10,7 @@
     <property name="default-height">360</property>
     <signal name="destroy" handler="client_exit_app" swapped="no"/>
     <child>
-      <!-- n-columns=3 n-rows=7 -->
+      <!-- n-columns=4 n-rows=7 -->
       <object class="GtkGrid">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
@@ -69,7 +69,7 @@
           <packing>
             <property name="left-attach">0</property>
             <property name="top-attach">0</property>
-            <property name="width">2</property>
+            <property name="width">3</property>
           </packing>
         </child>
         <child>
@@ -81,27 +81,75 @@
             <property name="stack">rooms</property>
           </object>
           <packing>
-            <property name="left-attach">0</property>
+            <property name="left-attach">1</property>
             <property name="top-attach">2</property>
           </packing>
         </child>
         <child>
-          <object class="GtkStack" id="rooms">
+          <!-- n-columns=3 n-rows=3 -->
+          <object class="GtkGrid" id="room0">
+            <property name="width-request">-1</property>
+            <property name="height-request">-1</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
+            <property name="row-spacing">8</property>
+            <property name="column-spacing">8</property>
+            <property name="row-homogeneous">True</property>
+            <property name="column-homogeneous">True</property>
             <child>
-              <!-- n-columns=3 n-rows=3 -->
-              <object class="GtkGrid" id="room">
+              <object class="GtkEntry" id="message_entry">
                 <property name="width-request">-1</property>
-                <property name="height-request">-1</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="valign">end</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="secondary-icon-name">mail-reply-sender-symbolic</property>
+                <property name="primary-icon-activatable">False</property>
+                <property name="primary-icon-sensitive">False</property>
+                <property name="placeholder-text" translatable="yes">Escriba su mensaje.</property>
+                <signal name="activate" handler="enter_signal" swapped="no"/>
+                <signal name="icon-press" handler="enter_icon" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">2</property>
+                <property name="width">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="user_list_container">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="shadow-type">in</property>
+                <child>
+                  <object class="GtkTreeView" id="user_list">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="tooltip-column">2</property>
+                    <child>
+                      <object class="GtkTreeViewColumn" id="column1">
+                        <property name="title" translatable="yes">Usuario</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn" id="column2">
+                        <property name="title" translatable="yes">Estado</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">2</property>
+                <property name="top-attach">0</property>
+                <property name="height">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkStack" id="rooms">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="row-spacing">8</property>
-                <property name="column-spacing">8</property>
-                <property name="row-homogeneous">True</property>
-                <property name="column-homogeneous">True</property>
                 <child>
                   <object class="GtkScrolledWindow">
                     <property name="visible">True</property>
@@ -118,76 +166,48 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
-                    <property name="width">2</property>
-                    <property name="height">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkScrolledWindow" id="user_list_container">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="shadow-type">in</property>
-                    <child>
-                      <object class="GtkTreeView" id="user_list">
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="tooltip-column">2</property>
-                        <child internal-child="selection">
-                          <object class="GtkTreeSelection"/>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn" id="column1">
-                            <property name="title" translatable="yes">Usuario</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn" id="column2">
-                            <property name="title" translatable="yes">Estado</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="left-attach">2</property>
-                    <property name="top-attach">0</property>
-                    <property name="height">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkEntry" id="message_entry">
-                    <property name="width-request">-1</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="valign">end</property>
-                    <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
-                    <property name="secondary-icon-name">mail-reply-sender-symbolic</property>
-                    <property name="primary-icon-activatable">False</property>
-                    <property name="primary-icon-sensitive">False</property>
-                    <property name="placeholder-text" translatable="yes">Escriba su mensaje.</property>
-                    <signal name="activate" handler="enter_signal" swapped="no"/>
-                    <signal name="icon-press" handler="enter_icon" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">2</property>
-                    <property name="width">2</property>
+                    <property name="name">General</property>
+                    <property name="title" translatable="yes">General</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="name">room_switcher</property>
-                <property name="title" translatable="yes">General</property>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+                <property name="width">2</property>
+                <property name="height">2</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="left-attach">0</property>
+            <property name="left-attach">1</property>
             <property name="top-attach">4</property>
           </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="left-attach">1</property>
+            <property name="top-attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
         </child>
         <child>
           <placeholder/>

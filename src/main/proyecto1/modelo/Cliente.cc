@@ -40,6 +40,14 @@ bool Cliente::get_bool_interface() {
   return this->interface;
 }
 
+int Cliente::get_response() {
+  return this->response;
+}
+
+std::string Cliente::get_str_response() {
+  return this->response_str;
+}
+
 void Cliente::set_text_buffer(GtkTextBuffer* text_buffer) {
   this->text_buffer = text_buffer;
 }
@@ -60,6 +68,9 @@ int Cliente::cliente_write_message(std::string username,
     return -1;
   std::string str_message = procesador.write_message_public_message(username,
 								    message);
+  gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					   ("You: " + message + "\n").c_str(),
+					   -1, NULL, "lmarg",  NULL);
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
 }
@@ -68,6 +79,15 @@ int Cliente::cliente_write_identify(char * message) {
   std::string str_message = procesador.write_message_new_user(message);
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
+}
+
+int Cliente::cliente_write_new_room(std::string roomname) {
+  std::string(Procesador::*procesador_write)(std::string) =
+    Fabrica_Procesadores::send_protocol_one(Protocolo::NEW_ROOM);
+  std::string message = (procesador.*procesador_write)
+    (roomname);
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
 }
 
 int Cliente::cliente_read() {
@@ -92,8 +112,6 @@ void Cliente::recv_messages() {
   std::string roomname;
   
   std::list<std::string>::iterator i;
-  
-  GtkTextIter iter;
   
   cv.wait(lk, [this]{return interface;});
   gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
@@ -180,10 +198,19 @@ void Cliente::recv_messages() {
 					       -1, NULL, "lmarg",  NULL);
       break;
     case INFO:// dialog con operación relacionada
+      response = 0;
+      response_str = recvd_message.front();
+      response_str[0] = toupper(response_str[0]);
       break;
     case WARNING:
+      response = 1;
+      response_str = recvd_message.front();
+      response_str[0] = toupper(response_str[0]);
       break;
     case ERROR:
+      response = 2;
+      response_str = recvd_message.front();
+      response_str[0] = toupper(response_str[0]);
       break;
     }
      

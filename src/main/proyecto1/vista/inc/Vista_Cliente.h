@@ -10,6 +10,8 @@ class Vista_Cliente {
   GtkWidget *welcome;
   /** La ventana principal del cliente */
   GtkWidget *window;
+  /** El widget de los cuartos del chat */
+  GtkWidget *room_widget;
   /** Administador de xml generado para la interfaz */
   GtkBuilder *builder;
   /** Variable para errores ocurridos al inicializar la interfaz */
@@ -34,19 +36,21 @@ class Vista_Cliente {
   GtkWidget *room_dialog;
   /** Ventana de creación de sala */
   GtkWidget *name_dialog;
+  /** Objeto de administración de cuartos */
+  GtkStack *rooms; 
   /** IP registrada por el usuario */
   const char* ip_data;
   /** Puerto registrada por el usuario */
   const char* port_data;
-  /** Nombre de la sala a crear */
-  std::string room_name;
   /** Nombre del usuario */
   std::string username;
   /** Única instancia de la interfaz del cliente*/
   static Vista_Cliente* vista_cliente;
   /** El widget de registro de mensajes */
   GtkWidget *text_box;
-
+  /** El widget de registro de mensajes por cuarto */
+  GtkWidget *room_text_box;
+  
   /**
    * Constructor de la clase Vista_Cliente.
    * @param argc El número de argumentos pasados a la aplicación
@@ -135,13 +139,6 @@ public:
   void set_port_data(const char* port_data);
 
   /**
-   * Define el nombre de sala registrado del cliente.
-   * @param room_name El nombre de sala 
-   *
-   */  
-  void set_room_name(std::string room_name);
-
-  /**
    * Define el nombre del usuario conectado.
    * @param username El nombre del usuario 
    *
@@ -168,13 +165,6 @@ public:
    *
    */
   const char* get_port_data();
-
-  /**
-   * Devuelve el nombre de sala registrado del cliente.
-   * @return El nombre de sala
-   *
-   */ 
-  std::string get_room_name();
 
   /**
    * Devuelve el nombre del usuario registrado.
@@ -273,6 +263,33 @@ public:
   GtkWidget* get_text_box();
   
   /**
+   * Devuelve el widget de registro de mensajes
+   * de un cuarto.
+   * @return El widget de registro de mensajes
+   * de un cuarto.
+   *
+   */
+  GtkWidget* get_room_text_box();
+
+  /**
+   * Devuelve el objeto de administración de
+   * cuartos.
+   * @return El objeto de administración de
+   * de cuartos.
+   *
+   */
+  GtkStack* get_rooms_stack();
+
+  /**
+   * Devuelve el objeto representante de 
+   * los cuartos del cliente.
+   * @return El objeto representante de
+   * los cuartos del cliente.
+   *
+   */
+  GtkWidget* get_room_widget();
+  
+  /**
    * Muestra la ventana de bienvenida del cliente.
    *
    */
@@ -290,6 +307,13 @@ public:
    *
    */
   void client_window(Cliente* cliente);
+
+  /**
+   * Inicia las variables asociadas a UI
+   * de los cuartos del cliente.
+   *
+   */
+  void rooms_widget(const gchar* roomname);
 
   /**
    * Muestra una ventana de diálogo en caso de
@@ -342,13 +366,41 @@ public:
    *
    */
   void window_read_error();
-
+  
   /**
    * Método auxiliar que define la ventana de introducción del
    * nombre de la sala que se desea crear.
    *
    */
   void window_room_creation();
+
+  /**
+   * Muestra una ventana de diálogo asociada a la ventana
+   * principal del cliente en caso de surgir un mensaje de
+   * error.
+   * @param message El mensaje asociado al error.
+   *
+   */
+  void window_main_error(std::string message);
+
+  /**
+   * Muestra una ventana de diálogo asociada a la ventana
+   * principal del cliente en caso surgir un mensaje de
+   * advertencia.
+   * @param message El mensaje asociado a la advertencia.
+   *
+   */
+  void window_main_warning(std::string message);
+
+  /**
+   * Muestra una ventana de diálogo asociada a la ventana
+   * principal del cliente en caso de surgir un mensaje de
+   * información.
+   * @param message El mensaje asociado a la información
+   * provista.
+   *
+   */
+  void window_main_info(std::string message);
 
 };
 

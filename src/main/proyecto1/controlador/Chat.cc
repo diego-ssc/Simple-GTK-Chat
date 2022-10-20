@@ -60,7 +60,7 @@ Vista_Cliente* Chat::get_vista_cliente() {
    return 0;
  }
 
-int Chat::inicia_servidor(int puerto) {//ejecuta_servidor
+int Chat::inicia_servidor(int puerto) {
   servidor = new Servidor(puerto);
   int tamano_cola = 10;
     
@@ -140,6 +140,23 @@ int Chat::inicia_cliente(int puerto, const char * ip) {
 
 void Chat::cliente_envia_mensaje_publico(std::string message) {
   cliente->cliente_write_message(client_name, message);
+}
+
+void Chat::cliente_crea_cuarto(std::string roomname) {
+  cliente->cliente_write_new_room(roomname);
+}
+
+int Chat::verifica_respuesta() {
+  int response = cliente->get_response();
+  std::string str_response = cliente->get_str_response();
+  if (response == 0) {
+    vista_cliente->window_main_info(str_response);
+  } else if (response == 1) {
+    vista_cliente->window_main_warning(str_response);	  
+  } else if (response == 2) {
+    vista_cliente->window_main_error(str_response);
+  }
+  return response;
 }
 
 bool Chat::valida_cliente(Cliente* cliente) {
