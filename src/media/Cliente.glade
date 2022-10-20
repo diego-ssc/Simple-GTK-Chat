@@ -87,7 +87,7 @@
         </child>
         <child>
           <!-- n-columns=3 n-rows=3 -->
-          <object class="GtkGrid" id="room0">
+          <object class="GtkGrid" id="General">
             <property name="width-request">-1</property>
             <property name="height-request">-1</property>
             <property name="visible">True</property>
@@ -127,14 +127,13 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="tooltip-column">2</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection"/>
+                    </child>
                     <child>
                       <object class="GtkTreeViewColumn" id="column1">
                         <property name="title" translatable="yes">Usuario</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkTreeViewColumn" id="column2">
-                        <property name="title" translatable="yes">Estado</property>
+                        <property name="clickable">True</property>
                       </object>
                     </child>
                   </object>

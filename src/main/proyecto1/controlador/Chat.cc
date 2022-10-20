@@ -159,6 +159,15 @@ int Chat::verifica_respuesta() {
   return response;
 }
 
+void Chat::lista_usuarios(std::string roomname) {
+  if (roomname.compare("General") == 0) {
+    cliente->cliente_write_user_list();
+    return;
+  }
+  
+  cliente->cliente_write_room_user_list(roomname);
+}
+
 bool Chat::valida_cliente(Cliente* cliente) {
   struct hostent* servidor = cliente->get_servidor();
   if (servidor == NULL) {

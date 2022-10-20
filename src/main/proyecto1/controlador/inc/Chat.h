@@ -238,6 +238,16 @@ protected:
    *
    */
   int verifica_respuesta();
+
+  /**
+   * Se encarga de pedir las listas de usuarios
+   * al servidor, a través del cliente.
+   * @param roomname El nombre del cuarto del que
+   * se pedirá la lista; o NULL si se pide la lista
+   * de usuarios del chat general.
+   *
+   */
+  void lista_usuarios(std::string roomname);
   
   /**
    * Asegura que el cliente creado sea una instancia

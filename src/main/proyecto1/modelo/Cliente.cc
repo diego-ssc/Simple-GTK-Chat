@@ -18,6 +18,7 @@ Cliente::Cliente(int puerto, const char * ip) {
   this->servidor = gethostbyname((char *)host_buffer);
   this->procesador = Procesador_Cliente();
   this->m_socket = socket(AF_INET, SOCK_STREAM, 0);
+  this->store = gtk_list_store_new(1, G_TYPE_STRING);
 }
 
 Procesador_Cliente Cliente::get_procesador() {
@@ -46,6 +47,10 @@ int Cliente::get_response() {
 
 std::string Cliente::get_str_response() {
   return this->response_str;
+}
+
+GtkListStore* Cliente::get_list_store() {
+  return this->store;
 }
 
 void Cliente::set_text_buffer(GtkTextBuffer* text_buffer) {
@@ -84,6 +89,23 @@ int Cliente::cliente_write_identify(char * message) {
 int Cliente::cliente_write_new_room(std::string roomname) {
   std::string(Procesador::*procesador_write)(std::string) =
     Fabrica_Procesadores::send_protocol_one(Protocolo::NEW_ROOM);
+  std::string message = (procesador.*procesador_write)
+    (roomname);
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
+}
+
+int Cliente::cliente_write_user_list() {
+  std::string(Procesador::*procesador_write)() =
+    Fabrica_Procesadores::send_protocol(Protocolo::USER_LIST);
+  std::string message = (procesador.*procesador_write)();
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
+}
+
+int Cliente::cliente_write_room_user_list(std::string roomname) {
+  std::string(Procesador::*procesador_write)(std::string) =
+    Fabrica_Procesadores::send_protocol_one(Protocolo::ROOM_USER_LIST);
   std::string message = (procesador.*procesador_write)
     (roomname);
   return write(m_socket, message.c_str(),
@@ -142,7 +164,12 @@ void Cliente::recv_messages() {
     case USER_LIST:
       for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
 	std::cout<<*i<<std::endl;// Establecer como modelo de lista de usuarios
+	gtk_list_store_append(store, &tree_iter);
+	gtk_list_store_set(store, &tree_iter, 0, *i, -1);
       }
+      
+      while (gtk_events_pending())
+	gtk_main_iteration();
       break;
     case MESSAGE_FROM:
       username = recvd_message.front();

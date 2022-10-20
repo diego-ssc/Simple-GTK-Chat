@@ -57,13 +57,21 @@ extern "C" {
   G_MODULE_EXPORT void client_hide_show_user_list() {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
     GtkWidget *list = vista->get_user_list_container();
+    GtkWidget *user_list = vista->get_user_list();
+    Chat* chat = Chat::get_instance();
+    GtkStack *rooms = vista->get_rooms_stack();
+    std::string child = std::string(gtk_stack_get_visible_child_name(rooms));
     if (gtk_widget_is_visible(list)) {
+      chat->lista_usuarios(child);
       gtk_widget_hide(list);
+      gtk_widget_hide(user_list);
     } else {
+      chat->lista_usuarios(child);
       gtk_widget_show(list);
+      gtk_widget_show(user_list);
     }
   }
-
+  
   G_MODULE_EXPORT void create_room() {
     Vista_Cliente* vista = Vista_Cliente::get_instance();
     vista->window_room_creation();
@@ -351,6 +359,7 @@ void Vista_Cliente::client_window(Cliente* cliente) {
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
   gtk_widget_show_all(window);
   gtk_widget_hide(user_list_container);
+  gtk_tree_view_set_model(GTK_TREE_VIEW(user_list), GTK_TREE_MODEL(cliente->get_list_store()));
   cliente->set_bool_interface(true);
   cliente->set_text_buffer(gtk_text_view_get_buffer
 			   (GTK_TEXT_VIEW(vista_cliente->get_text_box())));

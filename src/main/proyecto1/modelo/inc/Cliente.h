@@ -46,14 +46,19 @@ class Cliente {
   /** El objeto que guarda los mensajes que
       se mostrarán en la vista del cliente. */
   GtkTextBuffer* text_buffer;
-  /** El objeto que accede a al búfer del cliente */
+  /** El objeto que accede al búfer del cliente */
   GtkTextIter iter;
+  /** El objeto que accede a la lista de usuarios
+      del cliente */
+  GtkTreeIter tree_iter;
   /** 0, si el servidor responde con un mensaje
       de información; 1, si fue de advertencia;
       2, en otro caso. */
   int response = -1;
   /** Guarda el mensaje de respuesta del servidor */
   std::string response_str;
+  /** El modelo para la vista de usuarios */
+  GtkListStore* store;
 
   bool interface = false;
 
@@ -123,6 +128,12 @@ public:
    *
    */
   std::string get_str_response();
+
+  /**
+   * Devuelve el modelo de la lista de usuarios.
+   *
+   */
+  GtkListStore* get_list_store();
   
   /**
    * Devuelve el objeto que guarda los mensajes
@@ -177,6 +188,24 @@ public:
    *
    */
   int cliente_write_new_room(std::string roomname);
+
+  /**
+   * Envía la petición para obtener la lista
+   * del chat general
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_user_list();
+
+  /**
+   * Envía la petición para obtener la lista
+   * de un cuarto en particular.
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_room_user_list(std::string roomname);
   
   /**
    * Lee los datos recibidos en el socket del cliente.
