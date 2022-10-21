@@ -195,7 +195,7 @@ std::string Procesador_Cliente::write_message_new_room(std::string roomname) {
 }
 
 std::string Procesador_Cliente::write_message_invite(std::string roomname,
-				 std::list<std::string> usernames) {
+						     std::list<std::string> usernames) {
   vacia_json();
   parsed_message["type"] = "INVITE";
   parsed_message["roomname"] = roomname;

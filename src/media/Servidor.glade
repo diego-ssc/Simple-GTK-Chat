@@ -17,70 +17,6 @@
         <property name="row-spacing">8</property>
         <property name="column-spacing">8</property>
         <child>
-          <object class="GtkHeaderBar" id="title">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="valign">start</property>
-            <property name="hexpand">False</property>
-            <property name="vexpand">False</property>
-            <property name="title" translatable="yes">Chat</property>
-            <property name="show-close-button">True</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkButton" id="show_user_list">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="halign">end</property>
-                <property name="valign">end</property>
-                <property name="margin-right">4</property>
-                <property name="hexpand">False</property>
-                <property name="vexpand">False</property>
-                <signal name="clicked" handler="server_hide_show_user_list" swapped="no"/>
-                <child>
-                  <object class="GtkImage">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="icon-name">format-justify-fill-symbolic</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="pack-type">end</property>
-                <property name="position">7</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="left-attach">0</property>
-            <property name="top-attach">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkStackSwitcher" id="room_switcher">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="homogeneous">True</property>
-            <property name="stack">rooms</property>
-          </object>
-          <packing>
-            <property name="left-attach">0</property>
-            <property name="top-attach">2</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkStack" id="rooms">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -156,15 +92,71 @@
             </child>
           </object>
           <packing>
-            <property name="left-attach">0</property>
+            <property name="left-attach">1</property>
             <property name="top-attach">4</property>
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkHeaderBar" id="title">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">start</property>
+            <property name="hexpand">False</property>
+            <property name="vexpand">False</property>
+            <property name="title" translatable="yes">Chat</property>
+            <property name="show-close-button">True</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkButton" id="show_user_list">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="halign">end</property>
+                <property name="valign">end</property>
+                <property name="margin-right">4</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">False</property>
+                <signal name="clicked" handler="server_hide_show_user_list" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="icon-name">format-justify-fill-symbolic</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="pack-type">end</property>
+                <property name="position">7</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">0</property>
+            <property name="width">3</property>
+          </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="left-attach">1</property>
+            <property name="top-attach">5</property>
+          </packing>
         </child>
         <child>
           <placeholder/>

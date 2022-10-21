@@ -59,6 +59,8 @@ class Cliente {
   std::string response_str;
   /** El modelo para la vista de usuarios */
   GtkListStore* store;
+  /** Lista de búfers del cliente */
+  std::list<GtkWidget*> room_list;
 
   bool interface = false;
 
@@ -128,15 +130,9 @@ public:
    *
    */
   std::string get_str_response();
-
-  /**
-   * Devuelve el modelo de la lista de usuarios.
-   *
-   */
-  GtkListStore* get_list_store();
   
   /**
-   * Devuelve el objeto que guarda los mensajes
+   * Define el objeto que guarda los mensajes
    * mostrados al cliente.
    * @param El objeto que guarda los mensajes
    * mostrados al cliente.
@@ -144,6 +140,14 @@ public:
    */
   void set_text_buffer(GtkTextBuffer* text_buffer);
 
+  /**
+   * Define el objeto que guarda la lista de
+   * usuarios mostrada al cliente.
+   * @param list_store El objeto que guarda la
+   * lista de usuarios mostrada al cliente.
+   *
+   */
+  void set_list_store(GtkListStore* list_store);
 
   /**
    * Define el estado de la interfaz.
@@ -152,6 +156,13 @@ public:
    *
    */
   void set_bool_interface(bool interface);
+
+  /**
+   * Define la lista de búfers del cliente.
+   * @param list La lista de búfers del cliente.
+   *
+   */
+  void set_room_list(std::list<GtkWidget*> list);
   
   /**
    * Conecta el socket del cliente al socket del servidor.
@@ -170,6 +181,28 @@ public:
    */
   int cliente_write_message(std::string username,
 			    std::string message);
+
+  /**
+   * Envía el mensaje privado del usuario al servidor.
+   * @param username El nombre del usuario destinatario
+   * @param message El mensaje a enviar
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_private_message(std::string username,
+				    std::string message);
+
+  /**
+   * Envía el mensaje a un cuarto del usuario al servidor.
+   * @param username El nombre de la sala destino
+   * @param message El mensaje a enviar
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_room_message(std::string roomname,
+				 std::string message);
 
   /**
    * Envía el nombre del usuario al servidor.
@@ -206,6 +239,26 @@ public:
    *
    */
   int cliente_write_room_user_list(std::string roomname);
+  
+  /**
+   * Envía la petición para invitar a un usuario
+   * a un cuarto en particular.
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_send_invitation(std::list<std::string> usernames,
+			      std::string roomname);
+
+
+  /**
+   * Envía la petición para cambiar el estado
+   * del cliente.
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_change_status(std::string status);
   
   /**
    * Lee los datos recibidos en el socket del cliente.

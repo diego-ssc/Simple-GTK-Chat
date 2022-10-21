@@ -248,10 +248,12 @@ void Servidor::administra_cliente(Usuario* usuario) {
 	procesador.write_message_new_room_success();
 	cuarto = new Cuarto(roomname);
 	cuartos[roomname] = std::move(cuarto);
-	cuarto->add_member(name, usuario);
-      }	else 
+	cuarto->first_member(name, usuario);
+      }	else {
 	send_message_to(procesador.write_message_new_room_failure(roomname),
 			client_socket);
+      }
+
      
       break;
     case INVITE:
@@ -344,7 +346,8 @@ void Servidor::administra_cliente(Usuario* usuario) {
 	break;
       }
       cuarto = cuartos.at(roomname);
-      if (!cuarto->is_invited(name)
+      if ((!cuarto->is_invited(name) &&
+	   !cuarto->is_in(name))
 	  || (cuarto->is_invited(name)
 	      && !cuarto->is_in(name))) {
 	send_message_to(procesador.write_message_room_message_failure_invite(roomname),
@@ -353,6 +356,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
       }
       lista = cuarto->get_room_usernames();
       for (k = lista.begin(); k != lista.end(); ++k) {
+	if ((*k).compare(name) == 0) continue;
 	send_message_to(procesador.write_message_room_message_new(roomname,
 								  name,
 								  message),

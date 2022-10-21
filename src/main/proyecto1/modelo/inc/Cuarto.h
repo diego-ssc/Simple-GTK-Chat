@@ -12,13 +12,13 @@ class Cuarto {
    * Árbol binario ordenenado que guarda los usuarios
    * integrantes del cuarto, ordenándolos por nombre.
    */
-  std::map<std::string, Usuario> users;
+  std::map<std::string, Usuario*> users;
 
   /**
    * Diccionario que registra los usuarios que han sido
    * invitados al cuarto.
    */
-  std::map<std::string, Usuario> invited_users;
+  std::map<std::string, Usuario*> invited_users;
 
   /** El nombre del cuarto */
   std::string nombre;
@@ -69,6 +69,17 @@ class Cuarto {
    *
    */
   int add_member(std::string username, Usuario* user);
+
+
+  /**
+   * Agrega al primer usuario al cuarto, si este ha sido
+   * el creador de la sala.
+   * @param username El nombre del usuario a agregar
+   * @return 0, si se ejecutó correctamente; o -1, 
+   * si el usuario ya se encuentra dentro del cuarto.
+   *
+   */
+  int first_member(std::string username, Usuario* user);
 
   /**
    * Agrega a un usuario al diccionario de invitados

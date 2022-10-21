@@ -18,7 +18,6 @@ Cliente::Cliente(int puerto, const char * ip) {
   this->servidor = gethostbyname((char *)host_buffer);
   this->procesador = Procesador_Cliente();
   this->m_socket = socket(AF_INET, SOCK_STREAM, 0);
-  this->store = gtk_list_store_new(1, G_TYPE_STRING);
 }
 
 Procesador_Cliente Cliente::get_procesador() {
@@ -41,6 +40,10 @@ bool Cliente::get_bool_interface() {
   return this->interface;
 }
 
+void Cliente::set_room_list(std::list<GtkWidget*> list) {
+  this->room_list = list;
+}
+
 int Cliente::get_response() {
   return this->response;
 }
@@ -49,12 +52,12 @@ std::string Cliente::get_str_response() {
   return this->response_str;
 }
 
-GtkListStore* Cliente::get_list_store() {
-  return this->store;
-}
-
 void Cliente::set_text_buffer(GtkTextBuffer* text_buffer) {
   this->text_buffer = text_buffer;
+}
+
+void Cliente::set_list_store(GtkListStore* list_store) {
+  this->store = list_store;
 }
 
 void Cliente::set_bool_interface(bool interface) {
@@ -79,6 +82,59 @@ int Cliente::cliente_write_message(std::string username,
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
 }
+
+int Cliente::cliente_write_private_message(std::string username,
+					   std::string message) {
+  if (message.empty())
+    return -1;
+  std::string str_message = procesador.write_message_private_message_to(username,
+									message);
+
+  std::list<GtkWidget*>::iterator i;
+  GtkTextBuffer* text_buffer;
+  std::string widget_name;
+  for (i = room_list.begin(); i != room_list.end(); ++i) {
+    widget_name = gtk_widget_get_name(*i);
+    if ((widget_name.substr(10)).compare(username) == 0)
+      text_buffer = GTK_TEXT_BUFFER(*i);
+  }
+  
+  gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					   ("You: " + message + "\n").c_str(),
+					   -1, NULL, NULL,  NULL);
+  
+  return write(m_socket, str_message.c_str(),
+	       strlen(str_message.c_str()));
+}
+
+int Cliente::cliente_write_room_message(std::string roomname,
+					std::string message) {
+  if (message.empty())
+    return -1;
+  
+  std::string str_message = procesador.write_message_room_message(roomname,
+								  message);
+  std::list<GtkWidget*>::iterator i;
+  GtkTextBuffer* text_buffer;
+  std::string widget_name;
+  for (i = room_list.begin(); i != room_list.end(); ++i) {
+    widget_name = gtk_widget_get_name(*i);
+    if (widget_name.compare(roomname) == 0)
+      text_buffer = gtk_text_view_get_buffer
+	(GTK_TEXT_VIEW(*i));
+  }
+
+  gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
+  gtk_text_buffer_create_tag(text_buffer, "lmarg", 
+			     "left_margin", 5, NULL);
+  gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					   ("You: " + message + "\n").c_str(),
+					   -1, NULL, "lmarg",  NULL);
+
+  return write(m_socket, str_message.c_str(),
+	       strlen(str_message.c_str()));
+}
+
 
 int Cliente::cliente_write_identify(char * message) {
   std::string str_message = procesador.write_message_new_user(message);
@@ -108,6 +164,22 @@ int Cliente::cliente_write_room_user_list(std::string roomname) {
     Fabrica_Procesadores::send_protocol_one(Protocolo::ROOM_USER_LIST);
   std::string message = (procesador.*procesador_write)
     (roomname);
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
+}
+
+int Cliente::cliente_send_invitation(std::list<std::string> usernames, std::string roomname) {
+  
+  std::string message = procesador.write_message_invite(roomname, usernames);
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
+}
+
+int Cliente::cliente_change_status(std::string status) {
+  std::string(Procesador::*procesador_write)(std::string) =
+    Fabrica_Procesadores::send_protocol_one(Protocolo::NEW_STATUS);
+  std::string message = (procesador.*procesador_write)
+    (status);
   return write(m_socket, message.c_str(),
 	       strlen(message.c_str()));
 }
@@ -163,13 +235,9 @@ void Cliente::recv_messages() {
       break;
     case USER_LIST:
       for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
-	std::cout<<*i<<std::endl;// Establecer como modelo de lista de usuarios
 	gtk_list_store_append(store, &tree_iter);
-	gtk_list_store_set(store, &tree_iter, 0, *i, -1);
+	gtk_list_store_set(store, &tree_iter, 0, (*i).c_str(), -1);
       }
-      
-      while (gtk_events_pending())
-	gtk_main_iteration();
       break;
     case MESSAGE_FROM:
       username = recvd_message.front();
@@ -198,7 +266,8 @@ void Cliente::recv_messages() {
       break;
     case ROOM_USER_LIST:
       for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
-	std::cout<<*i<<std::endl;// Establecer como modelo de lista de usuarios del cuarto
+	gtk_list_store_append(store, &tree_iter);
+	gtk_list_store_set(store, &tree_iter, 0, (*i).c_str(), -1);
       }
       break;
     case ROOM_MESSAGE_FROM:

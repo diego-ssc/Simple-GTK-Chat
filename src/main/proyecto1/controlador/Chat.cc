@@ -88,7 +88,6 @@ int Chat::inicia_servidor(int puerto) {
 }
 
 void Chat::ejecuta_servidor() {
-  
   while(true) {
     int client_socket = servidor->servidor_accept();
     if (client_socket == -1)
@@ -138,12 +137,44 @@ int Chat::inicia_cliente(int puerto, const char * ip) {
   return 0;
 }
 
-void Chat::cliente_envia_mensaje_publico(std::string message) {
-  cliente->cliente_write_message(client_name, message);
+void Chat::cliente_envia_mensaje(std::string message,
+				 std::string roomname,
+				 std::list<GtkWidget*> list) {
+  cliente->set_room_list(list);
+  if (roomname.compare("General") == 0)
+    cliente->cliente_write_message(client_name, message);
+  else if (roomname.rfind("Private", 0) == 0) // Private : 
+    cliente->cliente_write_private_message(roomname.substr(10),
+					   message);
+  else 
+    cliente->cliente_write_room_message(roomname,
+					message);
 }
 
 void Chat::cliente_crea_cuarto(std::string roomname) {
   cliente->cliente_write_new_room(roomname);
+}
+
+void Chat::cliente_cambia_estado(std::string status) {
+  cliente->cliente_change_status(status);
+}
+
+void Chat::cliente_envia_invitacion(std::list<std::string> usernames,
+				    std::string roomname) {
+  if (usernames.empty())
+    return;
+
+  std::list<std::string>::iterator i;  
+  for (i = usernames.begin(); i != usernames.end(); ++i) {
+    if (client_name.compare(*i) == 0) {
+      usernames.remove(*i);
+      if (usernames.empty())
+	return;
+    }
+    
+  }
+  
+  cliente->cliente_send_invitation(usernames, roomname);
 }
 
 int Chat::verifica_respuesta() {
@@ -159,7 +190,9 @@ int Chat::verifica_respuesta() {
   return response;
 }
 
-void Chat::lista_usuarios(std::string roomname) {
+void Chat::lista_usuarios(std::string roomname,
+			  GtkListStore* liststore) {
+  cliente->set_list_store(liststore);
   if (roomname.compare("General") == 0) {
     cliente->cliente_write_user_list();
     return;

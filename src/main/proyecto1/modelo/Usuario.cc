@@ -32,13 +32,11 @@ Usuario::Usuario(int id, std::string nombre,
   this->nombre = nombre;
   this->socket = socket;
   this->th = std::move(th); //std::thread can't be copied
-  this->estado = "ACTIVE";
 }
 
 Usuario::Usuario(int id, int socket) {
   this->id = id;
   this->socket = socket;
-  this->estado = "ACTIVE";
 }
   
 void Usuario::set_thread(std::thread th) {

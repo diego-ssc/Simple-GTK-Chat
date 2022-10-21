@@ -215,11 +215,17 @@ protected:
   int inicia_cliente(int puerto, const char * ip);
 
   /**
-   * Envía un mensaje público desde el cliente.
+   * Envía un mensaje desde el cliente a una sala
+   * en concreto.
    * @param message El mensaje a enviar.
+   * @param roomname El nombre del cuarto al
+   * que se enviará el mensaje.
+   * @param list La lista que búfers de los cuartos.
    *
    */
-  void cliente_envia_mensaje_publico(std::string message);
+  void cliente_envia_mensaje(std::string message,
+			     std::string roomname,
+			     std::list<GtkWidget*> list);
 
   /**
    * Manda la petición de creación de cuarto desde
@@ -240,6 +246,23 @@ protected:
   int verifica_respuesta();
 
   /**
+   * Cambia el estado del cliente.
+   * @param status El estado del cliente.
+   *
+   */
+  void cliente_cambia_estado(std::string status);
+
+  /**
+   * Envía una invitación a un cuarto, desde el cliente.
+   * @param username La lista de usuarios a invitar.
+   * @param roomname El nombre de la sala a la que será
+   * invitado.
+   *
+   */
+  void cliente_envia_invitacion(std::list<std::string> username,
+				std::string roomname);
+
+  /**
    * Se encarga de pedir las listas de usuarios
    * al servidor, a través del cliente.
    * @param roomname El nombre del cuarto del que
@@ -247,7 +270,8 @@ protected:
    * de usuarios del chat general.
    *
    */
-  void lista_usuarios(std::string roomname);
+  void lista_usuarios(std::string roomname,
+		      GtkListStore* liststore);
   
   /**
    * Asegura que el cliente creado sea una instancia

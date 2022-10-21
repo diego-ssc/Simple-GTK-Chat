@@ -2,16 +2,17 @@
 #define VISTA_CLIENTE_H
 
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <glib-object.h>
 #include <stdio.h>
 #include "../../controlador/inc/Chat.h"
+#include <list>
 
 class Vista_Cliente {
   /** La ventana de bienvenida del cliente */
   GtkWidget *welcome;
   /** La ventana principal del cliente */
   GtkWidget *window;
-  /** El widget de los cuartos del chat */
-  GtkWidget *room_widget;
   /** Administador de xml generado para la interfaz */
   GtkBuilder *builder;
   /** Variable para errores ocurridos al inicializar la interfaz */
@@ -24,16 +25,22 @@ class Vista_Cliente {
   GtkEntry *message_box;
   /** Objeto de registro de nombre de sala */
   GtkEntry *room_creation_entry;
+  /** Objeto de elección de nombre de sala */
+  GtkEntry *room_election_entry;
   /** Objeto de registro de nombre de usuario */
   GtkEntry *name_entry;
+  /** Objeto de búsqueda de nombre de sala */
+  GtkEntry *room_name_entry;
   /** Botón de envío de información para la ventana de bienvenida */
   GtkButton *welcome_button;
   /** La lista de usuarios mostrada en cada sala */
-  GtkWidget *user_list;
+  GtkWidget *user_list;		  
   /** El contenedor de la lista de usuarios mostrada en cada sala */
   GtkWidget *user_list_container;
   /** Ventana de creación de sala */
   GtkWidget *room_dialog;
+  /** Ventana de elección de sala */
+  GtkWidget *room_election_dialog;
   /** Ventana de creación de sala */
   GtkWidget *name_dialog;
   /** Objeto de administración de cuartos */
@@ -50,6 +57,15 @@ class Vista_Cliente {
   GtkWidget *text_box;
   /** El widget de registro de mensajes por cuarto */
   GtkWidget *room_text_box;
+  /** Lista de objetos que representan los cuartos
+      de la interfaz */
+  std::list<GtkWidget*> room_list;
+  /** Confirma los usuarios seleccionados en
+      la invitación a una sala */
+  GtkButton* confirm_room_users;
+  /** El nombre del usuario seleccionado para ser invitado
+      a un cuarto */
+  std::string selected_user;
   
   /**
    * Constructor de la clase Vista_Cliente.
@@ -144,13 +160,14 @@ public:
    *
    */  
   void set_username(std::string username);
-  
+
   /**
-   * Define la lista de usuarios del cliente.
-   * @param user_list La lista de usuarios
+   * Define el nombre del usuario que fue invitado a una
+   * sala.
+   * @param EL nombre del usuario.
    *
    */  
-  void set_user_list(std::list<std::string> user_list);
+  std::string set_selected_user(std::string username);
   
   /**
    * Devuelve el ip del cliente.
@@ -203,6 +220,14 @@ public:
   GtkEntry* get_room_creation_entry();
 
   /**
+   * Devuelve el objeto que guarda el nombre de la sala a elegir.
+   * @return El objeto que registró el nombre de la sala
+   * a elegir
+   *
+   */
+  GtkEntry* get_room_election_entry();
+
+  /**
    * Devuelve el objeto que guarda el nombre usuario.
    * @return El objeto que registró el nombre de usuario.
    *
@@ -215,7 +240,7 @@ public:
    *
    */
   GtkWidget* get_user_list();
-
+  
   /**
    * Devuelve el objeto contenedor de la lista de usuarios.
    * @return El objeto que contenedor de la lista de usuarios
@@ -245,6 +270,15 @@ public:
    *
    */
   GtkWidget * get_room_dialog();
+
+  /**
+   * Devuelve el widget de la ventana de elección
+   * de salas.
+   * @return El widget de la ventana de elección
+   * de salas
+   *
+   */
+  GtkWidget * get_room_election_dialog();
 
   /**
    * Devuelve el widget de la ventana de registro
@@ -281,13 +315,39 @@ public:
   GtkStack* get_rooms_stack();
 
   /**
-   * Devuelve el objeto representante de 
-   * los cuartos del cliente.
-   * @return El objeto representante de
-   * los cuartos del cliente.
+   * Devuelve la lista de los cuartos del
+   * cliente.
+   * @return La lista de los cuartos del
+   * cliente.
    *
    */
-  GtkWidget* get_room_widget();
+  std::list<GtkWidget*> get_room_list();
+
+  /**
+   * Devuelve el objeto de búsqueda de nombres
+   * de cuartos.
+   * @return El objeto de búsqueda de nombres
+   * de cuartos.
+   *
+   */
+  GtkEntry* get_room_name_entry();
+
+  /**
+   * Devuelve el botón que confirma los usuarios seleccionados
+   * para la invitación a un cuarto.
+   * @return El botón que confirma los usuarios seleccionados
+   * para la invitación a un cuarto.
+   *
+   */
+  GtkButton* get_confirm_room_users();
+
+  /**
+   * Devuelve el nombre del usuario que fue invitado a una
+   * sala.
+   * @return EL nombre del usuario.
+   *
+   */  
+  std::string get_selected_user();
   
   /**
    * Muestra la ventana de bienvenida del cliente.
@@ -373,6 +433,13 @@ public:
    *
    */
   void window_room_creation();
+
+  /**
+   * Método auxiliar que define la ventana de introducción del
+   * nombre de la sala que a la que se desea invitar usuarios.
+   *
+   */
+  void window_room_election();
 
   /**
    * Muestra una ventana de diálogo asociada a la ventana
