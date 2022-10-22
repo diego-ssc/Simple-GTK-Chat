@@ -1,6 +1,6 @@
 #ifndef ENUM_CLASS_HASH
 #define ENUM_CLASS_HASH
-
+/** Hash oara guardar enums en diccionario */
 struct EnumClassHash {
   template <typename T>
   std::size_t operator()(T t) const {

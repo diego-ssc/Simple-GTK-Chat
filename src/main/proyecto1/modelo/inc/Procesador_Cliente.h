@@ -18,6 +18,7 @@ class Procesador_Cliente : public Procesador {
   const table_protocolo;
   
  public:
+  /** Métodos de conversión de json a cadena */
   std::list<std::string> parse_message_new_user(std::string message); 
   std::list<std::string> parse_message_new_status(std::string message);
   std::list<std::string> parse_message_user_list(std::string message);
@@ -29,7 +30,7 @@ class Procesador_Cliente : public Procesador {
   std::list<std::string> parse_message_room_message_from(std::string message);
   std::list<std::string> parse_message_left_room(std::string message);
   std::list<std::string> parse_message_disconnected(std::string message);
-
+  /** Métodos de creación de json */
   std::string write_message_new_user(std::string username);
   std::string write_message_new_status(std::string status);
   std::string write_message_user_list();
@@ -47,6 +48,7 @@ class Procesador_Cliente : public Procesador {
   std::string write_message_leave_room(std::string roomname);
   std::string write_message_disconnected();
 
+  /** Método que ayuda a garantizar el formato correcto de json recibidos  */
   void verifica_protocolo(Sintaxis miembro, Protocolo llave);
   
 };

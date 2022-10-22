@@ -148,11 +148,22 @@ public:
   /*
   * Devuelve un nuevo descriptor de archivo de socket o -1,
   * en caso de error.
+  * @return el nuevo descriptor de archivo o -1;
   */
   int servidor_accept();
-  
+
+  /*
+  * Envía un arreglo de caracteres al socket parámetro.
+  * @param descriptor_archivo el socket cliente
+  * @param message el mensaje a enviar
+  */
   int servidor_send(int descriptor_archivo, char * message);
 
+  /*
+  * Lee los datos del soket servidor.
+  * @param descriptor_archivo el socket 
+  *
+  */
   int servidor_read(int descriptor_archivo);
 
   /*
@@ -160,10 +171,13 @@ public:
   */
   void servidor_close(int descriptor_archivo);
 
+  /** Envía un mensaje global a los usuarios conectados */
   void global_message(std::string message);
 
+  /** Envía un mensaje global a los usuarios conectados */
   void global_message_from(std::string message, int sender_id);
 
+  /** Envía un mensaje a un usuario en concreto */
   void send_message_to(std::string message, int socket);
 
   /**

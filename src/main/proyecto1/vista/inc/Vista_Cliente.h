@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "../../controlador/inc/Chat.h"
 #include <list>
+class Cliente;
 
 class Vista_Cliente {
   /** La ventana de bienvenida del cliente */
@@ -29,8 +30,6 @@ class Vista_Cliente {
   GtkEntry *room_election_entry;
   /** Objeto de registro de nombre de usuario */
   GtkEntry *name_entry;
-  /** Objeto de búsqueda de nombre de sala */
-  GtkEntry *room_name_entry;
   /** Botón de envío de información para la ventana de bienvenida */
   GtkButton *welcome_button;
   /** La lista de usuarios mostrada en cada sala */
@@ -66,6 +65,12 @@ class Vista_Cliente {
   /** El nombre del usuario seleccionado para ser invitado
       a un cuarto */
   std::string selected_user;
+  /** Ventana de invitación a sala */
+  GtkWidget* invitation_dialog;
+  /** Etiqueta de ventana de invitación */
+  GtkLabel* invitation_label;
+  /** El cuarto de la invitación */
+  std::string invitation_roomname;
   
   /**
    * Constructor de la clase Vista_Cliente.
@@ -324,15 +329,6 @@ public:
   std::list<GtkWidget*> get_room_list();
 
   /**
-   * Devuelve el objeto de búsqueda de nombres
-   * de cuartos.
-   * @return El objeto de búsqueda de nombres
-   * de cuartos.
-   *
-   */
-  GtkEntry* get_room_name_entry();
-
-  /**
    * Devuelve el botón que confirma los usuarios seleccionados
    * para la invitación a un cuarto.
    * @return El botón que confirma los usuarios seleccionados
@@ -348,6 +344,27 @@ public:
    *
    */  
   std::string get_selected_user();
+  
+  /**
+   * Devuelve la ventana de invitación a sala
+   * @return La ventana de invitación a sala
+   *
+   */
+  GtkWidget* get_invitation_dialog();
+
+  /**
+   * Devuelve la etiqueta de invitación a sala
+   * @return La etiqueta de invitación a sala
+   *
+   */
+  GtkLabel* get_invitation_label();
+
+  /**
+   * Devuelve el nombre del cuarto de la invitación
+   * @return El nombre del cuarto de la invitación
+   *
+   */
+  std::string get_invitation_roomname();
   
   /**
    * Muestra la ventana de bienvenida del cliente.
@@ -439,7 +456,16 @@ public:
    * nombre de la sala que a la que se desea invitar usuarios.
    *
    */
-  void window_room_election();
+  void window_room_election(char* name);
+
+  /**
+   * Método que define la ventana de invitación a un cuarto.
+   * @param message El mensaje de invitación.
+   * @param roomname El nombre del cuarto.
+   *
+   */
+  void window_invitation(std::string message,
+			 std::string roomname);
 
   /**
    * Muestra una ventana de diálogo asociada a la ventana

@@ -19,11 +19,13 @@
 #include <gtk/gtk.h>
 #include "Procesador_Cliente.h"
 #include "Fabrica_Procesadores.h"
+#include "../../controlador/inc/Chat.h"
 
 inline std::condition_variable cv;
 /** Determinarán cuándo se inicia la interfaz */
 inline std::mutex m;
 inline std::unique_lock lk(m);
+class Chat;
 
 class Cliente {
 
@@ -61,6 +63,8 @@ class Cliente {
   GtkListStore* store;
   /** Lista de búfers del cliente */
   std::list<GtkWidget*> room_list;
+  /** El chat de la apliación */
+  Chat* chat;
 
   bool interface = false;
 
@@ -205,6 +209,12 @@ public:
 				 std::string message);
 
   /**
+   * Desconecta al cliente del servidor.
+   *
+   */
+  void cliente_disconnect();
+  
+  /**
    * Envía el nombre del usuario al servidor.
    * @param message El mensaje a enviar
    * @return 0, si el mensaje fue enviado correctamente;
@@ -259,6 +269,14 @@ public:
    *
    */
   int cliente_change_status(std::string status);
+
+  /**
+   * Envía la petición entrar en un cuarto.
+   * @return 0, si el mensaje fue enviado correctamente;
+   * -1, en otro caso
+   *
+   */
+  int cliente_write_join_room(std::string roomname);
   
   /**
    * Lee los datos recibidos en el socket del cliente.
@@ -282,12 +300,6 @@ public:
    *
    */
   std::thread crea_hilo_recv();
-  
-  /**
-   * Envía mensaje a todos los clientes..
-   *
-   */
-  void send_messages();
 
   /**
    * Método para recepción de mensajes del cliente.

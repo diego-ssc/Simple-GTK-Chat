@@ -239,7 +239,7 @@ std::string Procesador_Cliente::write_message_leave_room(std::string roomname) {
 
 std::string Procesador_Cliente::write_message_disconnected() {
   vacia_json();
-  parsed_message["type"] = "LEAVE_ROOM";
+  parsed_message["type"] = "DISCONNECT";
   return writer.write(parsed_message);
 }
 

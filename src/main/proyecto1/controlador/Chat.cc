@@ -113,9 +113,14 @@ void Chat::termina_servidor() {
   servidor->termina_ejecucion();
 }
 
+void Chat::invitation_dialog(std::string message,
+			     std::string roomname) {
+  vista_cliente->window_invitation(message, roomname);
+}
+
 int Chat::inicia_cliente(int puerto, const char * ip) {
   cliente = new Cliente(puerto, ip);
-  if (!valida_cliente(cliente))//move(cliente) 
+  if (!valida_cliente(cliente))
     return -1;
   
   if (cliente->cliente_connect() < 0) {
@@ -137,18 +142,31 @@ int Chat::inicia_cliente(int puerto, const char * ip) {
   return 0;
 }
 
+void Chat::cliente_desconecta() {
+  cliente->cliente_disconnect();
+}
+
+void Chat::cliente_cierra_socket() {
+  cliente->cliente_close();
+}
+
 void Chat::cliente_envia_mensaje(std::string message,
 				 std::string roomname,
 				 std::list<GtkWidget*> list) {
   cliente->set_room_list(list);
-  if (roomname.compare("General") == 0)
+  if (roomname.compare("General") == 0) {
     cliente->cliente_write_message(client_name, message);
-  else if (roomname.rfind("Private", 0) == 0) // Private : 
+    return;
+  } else if (roomname.rfind("Private", 0) == 0) {// Private :
     cliente->cliente_write_private_message(roomname.substr(10),
 					   message);
-  else 
+    return;
+  } else {
     cliente->cliente_write_room_message(roomname,
 					message);
+    
+  } 
+  
 }
 
 void Chat::cliente_crea_cuarto(std::string roomname) {
@@ -175,6 +193,10 @@ void Chat::cliente_envia_invitacion(std::list<std::string> usernames,
   }
   
   cliente->cliente_send_invitation(usernames, roomname);
+}
+
+void Chat::cliente_envia_respuesta_invitacion(std::string roomname) {
+  cliente->cliente_write_join_room(roomname);
 }
 
 int Chat::verifica_respuesta() {
@@ -217,13 +239,4 @@ bool Chat::valida_cliente(Cliente* cliente) {
   return true; 
 }
 
-/**
- * Define las acciones al capturar "Ctrl + C".
- * @param signal Señal a la que responderá al detectarse
- * la combinación de teclas.
- * 
- */
-void catch_ctrl_c(int signal) {
-  exit(signal);
-}
 

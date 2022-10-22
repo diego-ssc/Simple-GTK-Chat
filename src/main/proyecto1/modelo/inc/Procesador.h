@@ -38,7 +38,6 @@ protected:
   const table_sintaxis;
   
   void error(const char *message);
-  void verifica_protocolo(Sintaxis miembro, Protocolo llave);
   void verifica_miembro(Sintaxis miembro);
   void parse_message(std::string message);
   void vacia_json();
@@ -53,13 +52,38 @@ protected:
    *
    */
   Protocolo get_type(std::string message);
-  
+
   Procesador();
 
+  /**
+   * Convierte a cadena el kson recibido
+   * @param message el json recibido
+   *
+   */
   std::list<std::string> parse_message_response(std::string message);
-  
-  std::string write_message_error(std::string message);  
+
+  /**
+   * Escribe un mensaje de error, en formato
+   * json.
+   * @param message El mensaje de error
+   *
+   */
+  std::string write_message_error(std::string message);
+
+  /**
+   * Escribe un mensaje de advertencia, en formato
+   * json.
+   * @param message El mensaje de advertencia
+   *
+   */
   std::string write_message_warning(std::string message);
+
+  /**
+   * Escribe un mensaje de información, en formato
+   * json.
+   * @param message El mensaje de información
+   *
+   */
   std::string write_message_info(std::string message);
 
   

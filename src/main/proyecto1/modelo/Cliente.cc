@@ -89,19 +89,25 @@ int Cliente::cliente_write_private_message(std::string username,
     return -1;
   std::string str_message = procesador.write_message_private_message_to(username,
 									message);
-
   std::list<GtkWidget*>::iterator i;
   GtkTextBuffer* text_buffer;
   std::string widget_name;
   for (i = room_list.begin(); i != room_list.end(); ++i) {
     widget_name = gtk_widget_get_name(*i);
-    if ((widget_name.substr(10)).compare(username) == 0)
-      text_buffer = GTK_TEXT_BUFFER(*i);
+    if (widget_name.rfind("Private", 0) == 0) {
+      if ((widget_name.substr(10)).compare(username) == 0) {
+	text_buffer = gtk_text_view_get_buffer
+	  (GTK_TEXT_VIEW(*i));
+      }
+    }
   }
-  
+
+  gtk_text_buffer_get_iter_at_offset(text_buffer, &iter, 0);
+  gtk_text_buffer_create_tag(text_buffer, "lmarg", 
+			     "left_margin", 5, NULL);
   gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
 					   ("You: " + message + "\n").c_str(),
-					   -1, NULL, NULL,  NULL);
+					   -1, NULL, "lmarg",  NULL);
   
   return write(m_socket, str_message.c_str(),
 	       strlen(str_message.c_str()));
@@ -135,6 +141,11 @@ int Cliente::cliente_write_room_message(std::string roomname,
 	       strlen(str_message.c_str()));
 }
 
+void Cliente::cliente_disconnect() {
+  std::string message = procesador.write_message_disconnected();
+  write(m_socket, message.c_str(),
+	strlen(message.c_str()));
+}
 
 int Cliente::cliente_write_identify(char * message) {
   std::string str_message = procesador.write_message_new_user(message);
@@ -184,6 +195,12 @@ int Cliente::cliente_change_status(std::string status) {
 	       strlen(message.c_str()));
 }
 
+int Cliente::cliente_write_join_room(std::string roomname) {
+  std::string message = procesador.write_message_join_room(roomname);
+  return write(m_socket, message.c_str(),
+	       strlen(message.c_str()));
+}
+
 int Cliente::cliente_read() {
   bzero(buffer_recv, sizeof(buffer_recv));
   return recv(m_socket, buffer_recv, sizeof(buffer_recv), 0);
@@ -212,7 +229,8 @@ void Cliente::recv_messages() {
   gtk_text_buffer_create_tag(text_buffer, "lmarg", 
 			     "left_margin", 5, NULL);
   lk.unlock();
-      
+  Chat *chat;
+  
   while (true) {
     if (cliente_read() <= 0)
       continue;
@@ -221,6 +239,7 @@ void Cliente::recv_messages() {
       Fabrica_Procesadores::recv_protocol(protocolo);
     std::list<std::string> recvd_message = (procesador.*parse)
       (std::string(get_buffer_recv()));
+  
     switch (protocolo) {
     case NEW_USER:
       username = recvd_message.front();
@@ -231,7 +250,10 @@ void Cliente::recv_messages() {
     case NEW_STATUS:
       username = recvd_message.front();
       status = recvd_message.back();
-      // cambiar status de lista mostrada
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
+					       (username + " ha cambiado su estado a "
+						+ status).c_str(),
+					       -1, NULL, "lmarg",  NULL);
       break;
     case USER_LIST:
       for (i = recvd_message.begin(); i != recvd_message.end(); ++i) {
@@ -255,12 +277,17 @@ void Cliente::recv_messages() {
       break;
     case INVITATION:
       message = recvd_message.front();
-      // como dialog
+      i = recvd_message.begin();
+      i++; i++;
+      roomname = *i;
+      chat = Chat::get_instance();
+      chat->invitation_dialog(message, roomname);
       break;
     case JOINED_ROOM:
-      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      roomname = recvd_message.front(); 
       username = recvd_message.back();
-      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+      
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
 					       (username + " se ha unido\n").c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
@@ -271,18 +298,18 @@ void Cliente::recv_messages() {
       }
       break;
     case ROOM_MESSAGE_FROM:
-      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      roomname = recvd_message.front();
       i = recvd_message.begin();
       username = *++i;
       message = recvd_message.back();
-      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter,
 					       (username + ": " + message).c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
     case LEFT_ROOM:
-      roomname = recvd_message.front(); //Acceder a stack de cuarto
+      roomname = recvd_message.front(); 
       username = recvd_message.back();
-      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, // en buffer correspondiente
+      gtk_text_buffer_insert_with_tags_by_name(text_buffer, &iter, 
 					       (username + "se ha desconectado").c_str(),
 					       -1, NULL, "lmarg",  NULL);
 
@@ -293,7 +320,7 @@ void Cliente::recv_messages() {
 					       (username + "se ha desconectado").c_str(),
 					       -1, NULL, "lmarg",  NULL);
       break;
-    case INFO:// dialog con operación relacionada
+    case INFO:
       response = 0;
       response_str = recvd_message.front();
       response_str[0] = toupper(response_str[0]);

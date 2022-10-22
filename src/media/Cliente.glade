@@ -8,20 +8,6 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkMenu" id="private_message">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <child>
-      <object class="GtkMenuItem">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="tooltip-text" translatable="yes">Enviar mensaje privado</property>
-        <property name="label" translatable="yes">Enviar mensaje privado</property>
-        <property name="use-underline">True</property>
-        <signal name="activate" handler="send_private_message" swapped="no"/>
-      </object>
-    </child>
-  </object>
   <object class="GtkListStore" id="room_names">
     <columns>
       <!-- column-name NombreCuarto -->
@@ -30,23 +16,6 @@
   </object>
   <object class="GtkEntryCompletion" id="room_entry_completion">
     <property name="model">room_names</property>
-  </object>
-  <object class="GtkPopover" id="room_name_popover">
-    <property name="can-focus">False</property>
-    <child>
-      <object class="GtkEntry" id="room_name_entry">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="margin-left">6</property>
-        <property name="margin-right">6</property>
-        <property name="margin-top">6</property>
-        <property name="margin-bottom">6</property>
-        <property name="completion">room_entry_completion</property>
-        <property name="input-purpose">name</property>
-        <property name="input-hints">GTK_INPUT_HINT_WORD_COMPLETION | GTK_INPUT_HINT_NONE</property>
-        <signal name="activate" handler="show_invite_column" swapped="no"/>
-      </object>
-    </child>
   </object>
   <object class="GtkMenu" id="statu">
     <property name="visible">True</property>

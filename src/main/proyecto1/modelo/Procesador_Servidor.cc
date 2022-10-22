@@ -22,8 +22,8 @@ const Procesador_Servidor::table_protocolo = { {Protocolo::IDENTIFY, "IDENTIFY"}
  *
  */
 std::list<std::string> Procesador_Servidor::parse_message_id(std::string message) {
+  std::cout<<"Here"<<std::endl;
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::IDENTIFY);
   verifica_miembro(Sintaxis::username);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::username)].asString());  
@@ -37,7 +37,7 @@ std::list<std::string> Procesador_Servidor::parse_message_id(std::string message
  */
 std::list<std::string> Procesador_Servidor::parse_message_status(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::STATUS);
+
   verifica_miembro(Sintaxis::status);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::status)].asString());  
@@ -51,7 +51,6 @@ std::list<std::string> Procesador_Servidor::parse_message_status(std::string mes
  */
 std::list<std::string> Procesador_Servidor::parse_message_users(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::USERS);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::type)].asString());
   return lista;
@@ -59,7 +58,7 @@ std::list<std::string> Procesador_Servidor::parse_message_users(std::string mess
 
 std::list<std::string> Procesador_Servidor::parse_message_private_message(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::MESSAGE);
+  std::cout<<"Here2"<<std::endl;
   verifica_miembro(Sintaxis::username);
   verifica_miembro(Sintaxis::message);
   std::list<std::string> lista;
@@ -70,7 +69,7 @@ std::list<std::string> Procesador_Servidor::parse_message_private_message(std::s
 
 std::list<std::string> Procesador_Servidor::parse_message_public_message(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::PUBLIC_MESSAGE);
+  std::cout<<"Here3"<<std::endl;
   verifica_miembro(Sintaxis::username);
   verifica_miembro(Sintaxis::message);
   std::list<std::string> lista;
@@ -86,7 +85,6 @@ std::list<std::string> Procesador_Servidor::parse_message_public_message(std::st
  */
 std::list<std::string> Procesador_Servidor::parse_message_new_room(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::NEW_ROOM);
   verifica_miembro(Sintaxis::roomname);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());  
@@ -95,7 +93,7 @@ std::list<std::string> Procesador_Servidor::parse_message_new_room(std::string m
 
 std::list<std::string> Procesador_Servidor::parse_message_invite(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::INVITE);
+    std::cout<<"Here4"<<std::endl;
   verifica_miembro(Sintaxis::roomname);
   verifica_miembro(Sintaxis::usernames);
   std::list<std::string> lista;
@@ -113,7 +111,6 @@ std::list<std::string> Procesador_Servidor::parse_message_invite(std::string mes
  */
 std::list<std::string> Procesador_Servidor::parse_message_join_room(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::JOIN_ROOM);
   verifica_miembro(Sintaxis::roomname);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
@@ -127,7 +124,6 @@ std::list<std::string> Procesador_Servidor::parse_message_join_room(std::string 
  */
 std::list<std::string> Procesador_Servidor::parse_message_room_users(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::ROOM_USERS);
   verifica_miembro(Sintaxis::roomname);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
@@ -136,7 +132,6 @@ std::list<std::string> Procesador_Servidor::parse_message_room_users(std::string
 
 std::list<std::string> Procesador_Servidor::parse_message_room_message(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::ROOM_MESSAGE);
   verifica_miembro(Sintaxis::roomname);
   verifica_miembro(Sintaxis::message);
   std::list<std::string> lista;
@@ -152,7 +147,6 @@ std::list<std::string> Procesador_Servidor::parse_message_room_message(std::stri
  */
 std::list<std::string> Procesador_Servidor::parse_message_leave_room(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::LEAVE_ROOM);
   verifica_miembro(Sintaxis::roomname);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::roomname)].asString());
@@ -166,7 +160,6 @@ std::list<std::string> Procesador_Servidor::parse_message_leave_room(std::string
  */
 std::list<std::string> Procesador_Servidor::parse_message_disconnect(std::string message) {
   parse_message(message);
-  verifica_protocolo(Sintaxis::type, Protocolo::DISCONNECT);
   std::list<std::string> lista;
   lista.push_back(parsed_message[table_sintaxis.at(Sintaxis::type)].asString());
   return lista;
@@ -284,7 +277,7 @@ std::string Procesador_Servidor::write_message_invite_new(std::string roomname,
 							  std::string username) {
     vacia_json();
     parsed_message["type"] = "INVITATION";
-    parsed_message["message"] = username + "te invita al cuarto '" + roomname + "'";
+    parsed_message["message"] = username + " te invita al cuarto '" + roomname + "'";
     parsed_message["username"] = username;
     parsed_message["roomname"] = roomname;
     return writer.write(parsed_message);
@@ -443,15 +436,3 @@ std::string Procesador_Servidor::write_message_disconnect_new_rooms(std::string 
   return writer.write(parsed_message);
 }
 
-
-void Procesador_Servidor::verifica_protocolo(Sintaxis miembro, Protocolo llave) {
-  std::string str_miembro = table_sintaxis.at(miembro);
-  if (!parsed_message.isMember(str_miembro))
-    error(("Error: no se recibió un json válido.\n" 
-	   "(Ausencia de llave \"" + str_miembro + "\")").c_str());
-  
-  std::string str_llave = table_protocolo.at(llave);
-  if (strcmp(parsed_message[str_miembro].asString().c_str(),
-	     str_llave.c_str()) != 0)
-    error(("Error: no se recibió un json de " + str_llave + " válido.").c_str());
-}

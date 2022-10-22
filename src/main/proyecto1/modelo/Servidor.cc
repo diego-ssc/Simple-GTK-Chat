@@ -229,10 +229,11 @@ void Servidor::administra_cliente(Usuario* usuario) {
       lista.clear();
       break;
     case MESSAGE:
+      message = (procesador.*write_two_arguments)(name, recvd_message.back());
       username = recvd_message.front();
       i = usuarios.find(username);
       if (i != usuarios.end()) 
-	send_message_to(recvd_message.back(), i->second->get_socket());
+	send_message_to(message, i->second->get_socket());
       else
 	send_message_to(procesador.write_message_private_message_failure(username),
 			client_socket);
@@ -309,6 +310,7 @@ void Servidor::administra_cliente(Usuario* usuario) {
 		      client_socket);
       lista = cuarto->get_room_usernames();
       for (k = lista.begin(); k != lista.end(); ++k) {
+	if ((*k).compare(usuario->get_name()) == 0) continue;
 	send_message_to((procesador.*write_two_arguments)(roomname, name),
 			usuarios.at(*k)->get_socket());
       }

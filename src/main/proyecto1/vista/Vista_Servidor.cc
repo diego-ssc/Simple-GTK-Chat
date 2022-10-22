@@ -237,8 +237,4 @@ void Vista_Servidor::servidor_accepted_message(int ip, int puerto) {
   std::string message = "Se ha establecido una conexión con " + std::to_string(ip) +
     "con puerto " + std::to_string(puerto);
 
-  // escribir en buffer de mensajes del servidor
-  /*     // 	   << inet_ntoa(this->direccion_cliente.sin_addr) */
-  /*     // 	   <<", con puerto "<< ntohs(this->direccion_cliente.sin_port) */
-  // strerror(errno)
 }

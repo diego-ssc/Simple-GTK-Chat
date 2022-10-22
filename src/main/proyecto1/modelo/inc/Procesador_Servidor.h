@@ -17,7 +17,6 @@ class Procesador_Servidor : public Procesador {
   static std::unordered_map<Protocolo, std::string, EnumClassHash>
   const table_protocolo; 
 
-  void verifica_protocolo(Sintaxis miembro, Protocolo llave);
   
  public:
   
@@ -130,6 +129,7 @@ class Procesador_Servidor : public Procesador {
    */ 
   std::list<std::string> parse_message_disconnect(std::string message);
 
+  /** Métodos de escrutura de json */
   std::string write_message_id_success(); 
   std::string write_message_id_new_user(std::string username);
   std::string write_message_id_failure(std::string username); 

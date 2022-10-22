@@ -18,6 +18,7 @@
 /** "Forward declaration" de clases con dependencias circulares */
 class Vista_Cliente;
 class Vista_Servidor;
+class Cliente;
 
 class Chat {  
 
@@ -206,6 +207,14 @@ protected:
    *
    */
   void termina_servidor();
+
+  /**
+   * Crea una ventana de información para el cliente
+   * creados por el mismo.
+   *
+   */
+  void invitation_dialog(std::string message,
+			 std::string roomname);
   
   /**
    * Inicia el cliente.
@@ -226,6 +235,18 @@ protected:
   void cliente_envia_mensaje(std::string message,
 			     std::string roomname,
 			     std::list<GtkWidget*> list);
+
+  /**
+   * Envía la petición de desconexión al servidor.
+   *
+   */
+  void cliente_desconecta();
+
+  /**
+   * Cierra el socket del cliente.
+   *
+   */
+  void cliente_cierra_socket();
 
   /**
    * Manda la petición de creación de cuarto desde
@@ -262,6 +283,12 @@ protected:
   void cliente_envia_invitacion(std::list<std::string> username,
 				std::string roomname);
 
+  /**
+   * Envía la respuesta a la invitación a un cuarto, desde el cliente.
+   *
+   */
+  void cliente_envia_respuesta_invitacion(std::string roomname);
+  
   /**
    * Se encarga de pedir las listas de usuarios
    * al servidor, a través del cliente.
